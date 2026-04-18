@@ -52,7 +52,7 @@ export default function Home() {
               <TrueFocus 
                 sentence="GAYA, LO, FOTO, LO, ZEPRET, AJA!" 
                 separator=", "
-                manualMode={true}
+                manualMode={false}
                 blurAmount={4}
                 borderColor="#ff5a8f"
                 glowColor="rgba(255, 90, 143, 0.4)"
