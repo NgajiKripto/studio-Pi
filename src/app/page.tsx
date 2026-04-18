@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import { ZepretButton, ZepretCard, ZepretBadge } from '@/components/ZepretUI';
 import { Sparkles, Camera, Zap, Heart, Download, Check, X } from 'lucide-react';
@@ -38,7 +37,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section id="hero-section" className="relative min-h-screen flex items-center justify-center px-6 pt-32 lg:pt-0 overflow-hidden">
+      <section id="hero-section" className="relative min-h-screen flex items-center justify-center px-6 pt-32 lg:pt-0 overflow-hidden cursor-crosshair">
         <div className="absolute -top-20 -left-20 w-96 h-96 bg-secondary-container/20 blur-[120px] rounded-full animate-pulse-glow"></div>
         <div className="absolute top-1/2 -right-20 w-80 h-80 bg-primary-container/10 blur-[100px] rounded-full"></div>
         
@@ -53,6 +52,7 @@ export default function Home() {
               <TrueFocus 
                 sentence="GAYA LO, FOTO LO, ZEPRET AJA!" 
                 separator=", "
+                manualMode={true}
                 blurAmount={4}
                 borderColor="#ff5a8f"
                 glowColor="rgba(255, 90, 143, 0.4)"

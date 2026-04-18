@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -30,12 +29,11 @@ const TrueFocus = ({
 }: TrueFocusProps) => {
   const words = sentence.split(separator);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [lastActiveIndex, setLastActiveIndex] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [focusRect, setFocusRect] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
-  // Automatic cycling
+  // Automatic cycling (Only if NOT manualMode)
   useEffect(() => {
     if (!manualMode) {
       const interval = setInterval(
@@ -54,8 +52,8 @@ const TrueFocus = ({
     const handleGlobalClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       
-      // Don't trigger if clicking on interactive elements like buttons or links
-      if (target.closest('button') || target.closest('a')) return;
+      // Don't trigger if clicking on interactive elements like buttons, links, or inputs
+      if (target.closest('button') || target.closest('a') || target.closest('input')) return;
       
       // Check if the click happened inside the hero section
       const heroSection = document.getElementById('hero-section');
@@ -68,9 +66,9 @@ const TrueFocus = ({
     return () => window.removeEventListener('click', handleGlobalClick);
   }, [words.length]);
 
+  // Update focus rectangle when current index changes
   useEffect(() => {
-    if (currentIndex === null || currentIndex === -1) return;
-
+    if (currentIndex < 0 || currentIndex >= words.length) return;
     if (!wordRefs.current[currentIndex] || !containerRef.current) return;
 
     const parentRect = containerRef.current.getBoundingClientRect();
@@ -87,19 +85,6 @@ const TrueFocus = ({
     }
   }, [currentIndex, words.length]);
 
-  const handleMouseEnter = (index: number) => {
-    if (manualMode) {
-      setLastActiveIndex(index);
-      setCurrentIndex(index);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (manualMode) {
-      setCurrentIndex(lastActiveIndex ?? 0);
-    }
-  };
-
   return (
     <div className={`focus-container ${className}`} ref={containerRef}>
       {words.map((word, index) => {
@@ -108,7 +93,7 @@ const TrueFocus = ({
           <span
             key={index}
             ref={el => { wordRefs.current[index] = el; }}
-            className={`focus-word ${manualMode ? 'manual' : ''} ${isActive && !manualMode ? 'active' : ''}`}
+            className={`focus-word ${isActive ? 'active' : ''}`}
             style={{
               filter: isActive ? 'blur(0px)' : `blur(${blurAmount}px)`,
               transition: `filter ${animationDuration}s ease`,
@@ -116,8 +101,6 @@ const TrueFocus = ({
               '--border-color': borderColor,
               '--glow-color': glowColor,
             }}
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={handleMouseLeave}
           >
             {word}
           </span>
@@ -131,10 +114,10 @@ const TrueFocus = ({
           y: focusRect.y,
           width: focusRect.width,
           height: focusRect.height,
-          opacity: currentIndex >= 0 ? 1 : 0
         }}
         transition={{
-          duration: animationDuration
+          duration: animationDuration,
+          ease: "easeInOut"
         }}
         style={{
           // @ts-ignore
