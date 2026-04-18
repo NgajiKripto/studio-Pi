@@ -9,8 +9,10 @@ export default function CameraScrollProgress() {
   useEffect(() => {
     const handleScroll = () => {
       const winScroll = window.scrollY;
-      const height = document.documentElement.scrollHeight - window.innerHeight;
-      const scrolled = (winScroll / height) * 100;
+      const docHeight = document.documentElement.scrollHeight;
+      const winHeight = window.innerHeight;
+      const height = docHeight - winHeight;
+      const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
       setScrollPercent(scrolled);
     };
 
@@ -19,8 +21,8 @@ export default function CameraScrollProgress() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Numbers from 0 to 100 in increments of 10
-  const markers = Array.from({ length: 11 }, (_, i) => i * 10);
+  // Numbers from 1 at the top to 100 at the bottom as requested
+  const markers = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
   return (
     <div className="fixed right-6 top-1/2 -translate-y-1/2 z-[100] hidden lg:flex flex-col items-center pointer-events-none">
@@ -33,6 +35,7 @@ export default function CameraScrollProgress() {
         {/* Indicators and Numbers */}
         {markers.map((num, idx) => {
           // Calculate if this marker is "active" based on scroll position
+          // Using the index to determine visual position (0% top to 100% bottom)
           const markerTarget = (idx / (markers.length - 1)) * 100;
           const isActive = Math.abs(scrollPercent - markerTarget) < (100 / (markers.length - 1)) / 2;
 
