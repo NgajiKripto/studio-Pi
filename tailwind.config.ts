@@ -11,7 +11,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
+        headline: ['Space Grotesk', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -26,28 +26,28 @@ export default {
           foreground: 'hsl(var(--popover-foreground))',
         },
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: '#FC5988',
+          foreground: '#FFFFFF',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: '#F2EB08',
+          foreground: '#111111',
         },
         muted: {
           DEFAULT: 'hsl(var(--muted))',
           foreground: 'hsl(var(--muted-foreground))',
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: '#FCF4F5',
+          foreground: '#111111',
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
         },
-        border: 'hsl(var(--border))',
+        border: '#111111',
         input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
+        ring: '#FC5988',
         chart: {
           '1': 'hsl(var(--chart-1))',
           '2': 'hsl(var(--chart-2))',
@@ -67,9 +67,18 @@ export default {
         },
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        lg: '0',
+        md: '0',
+        sm: '0',
+      },
+      boxShadow: {
+        'brutal': '4px 4px 0px 0px #111111',
+        'brutal-lg': '8px 8px 0px 0px #111111',
+        'brutal-active': '1px 1px 0px 0px #111111',
+      },
+      borderWidth: {
+        '3': '3px',
+        '4': '4px',
       },
       keyframes: {
         'accordion-down': {
@@ -88,10 +97,20 @@ export default {
             height: '0',
           },
         },
+        'hover-bounce': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-4px)' },
+        },
+        'pulse-timer': {
+          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+          '50%': { opacity: '0.8', transform: 'scale(1.05)' },
+        }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'hover-bounce': 'hover-bounce 0.3s ease-in-out infinite',
+        'pulse-timer': 'pulse-timer 1s ease-in-out infinite',
       },
     },
   },
