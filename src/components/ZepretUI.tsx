@@ -3,20 +3,20 @@ import { cn } from '@/lib/utils';
 
 export const ZepretButton = React.forwardRef<
   HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'outline' }
+  React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'glass' | 'outline' }
 >(({ className, variant = 'primary', ...props }, ref) => {
   const variants = {
-    primary: 'bg-primary text-white',
-    secondary: 'bg-secondary text-black',
-    outline: 'bg-white text-black',
+    primary: 'bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed shadow-[0_10px_20px_rgba(255,90,143,0.3)] hover:scale-105',
+    secondary: 'bg-gradient-to-br from-secondary to-secondary-container text-white shadow-[0_10px_20px_rgba(82,3,213,0.3)] hover:scale-105',
+    glass: 'glass-panel text-white hover:bg-white/10',
+    outline: 'border border-white/10 text-white hover:bg-white/5',
   };
 
   return (
     <button
       ref={ref}
       className={cn(
-        'neobrutal-shadow border-3 border-black font-headline uppercase font-black px-6 py-3 transition-all',
-        'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px]',
+        'px-8 py-3 rounded-xl font-headline font-bold transition-all duration-300 flex items-center justify-center gap-2',
         variants[variant],
         className
       )}
@@ -30,7 +30,7 @@ export const ZepretCard = ({ className, children, ...props }: React.HTMLAttribut
   return (
     <div
       className={cn(
-        'neobrutal-shadow border-3 border-black bg-white p-6',
+        'glass-panel p-8 rounded-lg shadow-2xl transition-all duration-500',
         className
       )}
       {...props}
@@ -40,11 +40,17 @@ export const ZepretCard = ({ className, children, ...props }: React.HTMLAttribut
   );
 };
 
-export const ZepretBadge = ({ className, children, color = 'primary' }: { className?: string, children: React.ReactNode, color?: 'primary' | 'secondary' }) => {
+export const ZepretBadge = ({ className, children, color = 'primary' }: { className?: string, children: React.ReactNode, color?: 'primary' | 'secondary' | 'tertiary' }) => {
+  const colors = {
+    primary: 'text-primary border-primary/20',
+    secondary: 'text-secondary border-secondary/20',
+    tertiary: 'text-tertiary border-tertiary/20',
+  };
+
   return (
     <span className={cn(
-      'border-2 border-black px-3 py-1 font-headline font-bold text-xs uppercase neobrutal-shadow',
-      color === 'primary' ? 'bg-primary text-white' : 'bg-secondary text-black',
+      'inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border font-label text-sm font-semibold tracking-wider uppercase',
+      colors[color],
       className
     )}>
       {children}
