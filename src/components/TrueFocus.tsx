@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -48,14 +49,19 @@ const TrueFocus = ({
     }
   }, [manualMode, animationDuration, pauseBetweenAnimations, words.length]);
 
-  // Click-to-focus listener (Global click)
+  // Click-to-focus listener (Scoped to Hero Section)
   useEffect(() => {
     const handleGlobalClick = (e: MouseEvent) => {
-      // Don't trigger if clicking on interactive elements like buttons or links
       const target = e.target as HTMLElement;
+      
+      // Don't trigger if clicking on interactive elements like buttons or links
       if (target.closest('button') || target.closest('a')) return;
       
-      setCurrentIndex(prev => (prev + 1) % words.length);
+      // Check if the click happened inside the hero section
+      const heroSection = document.getElementById('hero-section');
+      if (heroSection && heroSection.contains(target)) {
+        setCurrentIndex(prev => (prev + 1) % words.length);
+      }
     };
 
     window.addEventListener('click', handleGlobalClick);
