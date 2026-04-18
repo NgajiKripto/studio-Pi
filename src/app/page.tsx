@@ -26,7 +26,7 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-4 bg-zinc-900/60 backdrop-blur-xl rounded-full mt-6 mx-auto w-[90%] max-w-7xl border border-white/10 shadow-[0_20px_50px_rgba(82,3,213,0.15)]">
         <div className="text-2xl font-black italic text-transparent bg-clip-text bg-gradient-to-br from-[#ffb1c3] to-[#ff5a8f] font-headline">Zepret</div>
         <div className="hidden md:flex gap-8 items-center">
-          <Link href="#" className="text-white font-bold border-b-2 border-primary-container pb-1 font-headline tracking-tight">Explore</Link>
+          <Link href="#" className="text-white font-bold border-b-2 border-[#ff5a8f] pb-1 font-headline tracking-tight">Explore</Link>
           <Link href="#" className="text-zinc-400 hover:text-zinc-100 transition-colors font-headline tracking-tight">Showcase</Link>
           <Link href="#" className="text-zinc-400 hover:text-zinc-100 transition-colors font-headline tracking-tight">Features</Link>
           <Link href="/studio" className="text-zinc-400 hover:text-zinc-100 transition-colors font-headline tracking-tight">Studio</Link>
