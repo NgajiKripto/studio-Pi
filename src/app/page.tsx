@@ -78,6 +78,39 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Tentang Kami Section */}
+      <section className="py-32 px-6 max-w-5xl mx-auto text-center relative">
+        <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full -z-10"></div>
+        <ZepretBadge color="primary" className="mb-8 opacity-60">
+          Tentang Kami
+        </ZepretBadge>
+        <h2 className="text-4xl md:text-6xl font-headline font-black text-white mb-8 leading-tight">
+          Solusi <span className="italic text-transparent bg-clip-text bg-gradient-to-br from-primary to-secondary">Photobox Digital</span> Masa Depan
+        </h2>
+        <p className="text-xl text-on-surface-variant max-w-3xl mx-auto leading-relaxed mb-20 font-body">
+          Zepret bukan sekadar aplikasi kamera biasa. Kami menggabungkan teknologi <span className="font-bold text-white">Computer Vision</span> dengan estetika <span className="font-bold text-white">Holographic</span> untuk menciptakan pengalaman fotografi yang imersif.
+        </p>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-8 max-w-4xl mx-auto">
+          <div className="space-y-2">
+            <div className="text-5xl font-black text-primary">1M+</div>
+            <div className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-500">Captures</div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-5xl font-black text-secondary">500+</div>
+            <div className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-500">AI Frames</div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-5xl font-black text-tertiary">50k+</div>
+            <div className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-500">Happy Users</div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-5xl font-black text-white">24/7</div>
+            <div className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-500">Support</div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-16">
