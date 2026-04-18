@@ -1,15 +1,16 @@
-
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ZepretButton, ZepretCard, ZepretBadge } from '@/components/ZepretUI';
-import { Camera, Timer, X, Sparkles, Check, Download, Share2, Wand2 } from 'lucide-react';
+import { Camera, Timer, X, Sparkles, Check, Download, Share2, Wand2, ChevronRight } from 'lucide-react';
 import { aiPoseGuide } from '@/ai/flows/ai-pose-guide';
 import { generateSocialShareSuggestions } from '@/ai/flows/ai-social-share-suggestions';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 
 type Step = 'permission' | 'terms' | 'package' | 'payment' | 'session' | 'review';
+
+const STEPS: Step[] = ['permission', 'terms', 'package', 'payment', 'session', 'review'];
 
 export default function StudioSession() {
   const [step, setStep] = useState<Step>('permission');
@@ -25,6 +26,9 @@ export default function StudioSession() {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const currentStepIndex = STEPS.indexOf(step);
+  const progressPercent = ((currentStepIndex + 1) / STEPS.length) * 100;
 
   const requestCamera = async () => {
     try {
@@ -107,7 +111,21 @@ export default function StudioSession() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto py-12 px-4 space-y-8">
+    <div className="w-full max-w-6xl mx-auto py-12 px-4 space-y-12">
+      {/* Step Progress Bar */}
+      <div className="max-w-2xl mx-auto space-y-4">
+        <div className="flex justify-between items-end">
+           <p className="text-[10px] font-black uppercase tracking-widest text-primary">Progress: {Math.round(progressPercent)}%</p>
+           <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Step {currentStepIndex + 1} of 6</p>
+        </div>
+        <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px]">
+          <div 
+            className="h-full bg-gradient-to-r from-primary to-primary-container rounded-full transition-all duration-700 ease-out shadow-[0_0_15px_rgba(255,90,143,0.5)]" 
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+      </div>
+
       {step === 'permission' && (
         <ZepretCard className="max-w-md mx-auto space-y-6 text-center border-primary/20">
           <div className="flex justify-center">
@@ -169,7 +187,7 @@ export default function StudioSession() {
                 <li className="flex items-center gap-2"><Check className="text-tertiary" size={20} /> Free 3 Aksesoris 3D</li>
                 <li className="flex items-center gap-2"><Check className="text-tertiary" size={20} /> Cloud Storage 7 Hari</li>
               </ul>
-              <ZepretButton onClick={() => handlePackageSelect('10min')} className="w-full">
+              <ZepretButton onClick={handlePackageSelect.bind(null, '10min')} className="w-full">
                 Sikat!
               </ZepretButton>
             </ZepretCard>

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ZepretButton, ZepretCard, ZepretBadge } from '@/components/ZepretUI';
-import { Sparkles, Camera, Zap, Heart, Download, Check, X } from 'lucide-react';
+import { Sparkles, Camera, Zap, Heart, Download, Check, X, MousePointer2 } from 'lucide-react';
 import CameraScrollProgress from '@/components/CameraScrollProgress';
 import OrbitImages from '@/components/OrbitImages';
 import TrueFocus from '@/components/TrueFocus';
@@ -37,7 +37,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section id="hero-section" className="relative min-h-screen flex items-center justify-center px-6 pt-32 lg:pt-0 overflow-hidden cursor-crosshair">
+      <section id="hero-section" className="relative min-h-screen flex items-center justify-center px-6 pt-32 lg:pt-0 overflow-hidden cursor-crosshair group">
         <div className="absolute -top-20 -left-20 w-96 h-96 bg-secondary-container/20 blur-[120px] rounded-full animate-pulse-glow"></div>
         <div className="absolute top-1/2 -right-20 w-80 h-80 bg-primary-container/10 blur-[100px] rounded-full"></div>
         
@@ -48,7 +48,7 @@ export default function Home() {
               The Holographic Era
             </ZepretBadge>
             
-            <div className="space-y-6">
+            <div className="space-y-6 relative">
               <TrueFocus 
                 sentence="GAYA LO, FOTO LO, ZEPRET AJA!" 
                 separator=", "
@@ -59,7 +59,13 @@ export default function Home() {
                 className="text-5xl md:text-7xl lg:text-8xl font-headline font-black leading-tight tracking-tighter text-white uppercase"
               />
               
-              <div className="pt-2">
+              {/* Interaction Hint */}
+              <div className="absolute -bottom-8 left-0 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary/60 animate-bounce group-hover:opacity-100 opacity-40 transition-opacity">
+                <MousePointer2 size={12} />
+                Click anywhere to shift focus
+              </div>
+
+              <div className="pt-6">
                 <p className="text-xl md:text-2xl font-black italic tracking-widest text-primary-container opacity-80 uppercase">
                   CAPTURE THE FUTURE MOMENT
                 </p>
