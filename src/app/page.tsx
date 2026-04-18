@@ -1,9 +1,9 @@
-
 import Link from 'next/link';
 import { ZepretButton, ZepretCard, ZepretBadge } from '@/components/ZepretUI';
-import { Sparkles, Camera, Zap, Heart, Download, CameraFront, Check, X } from 'lucide-react';
+import { Sparkles, Camera, Zap, Heart, Download, Check, X } from 'lucide-react';
 import CameraScrollProgress from '@/components/CameraScrollProgress';
 import OrbitImages from '@/components/OrbitImages';
+import TrueFocus from '@/components/TrueFocus';
 
 export default function Home() {
   const communityImages = [
@@ -47,10 +47,23 @@ export default function Home() {
               <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
               The Holographic Era
             </ZepretBadge>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-headline font-black leading-tight tracking-tighter text-white">
-              GAYA LO, FOTO LO, <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary to-primary-container">ZEPRET AJA!</span>
-            </h1>
+            
+            <div className="space-y-2">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-headline font-black leading-tight tracking-tighter text-white uppercase">
+                GAYA LO, FOTO LO, <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary to-primary-container">ZEPRET AJA!</span>
+              </h1>
+              <div className="pt-4">
+                <TrueFocus 
+                  sentence="CAPTURE THE FUTURE MOMENT" 
+                  blurAmount={3}
+                  borderColor="#ff5a8f"
+                  glowColor="rgba(255, 90, 143, 0.4)"
+                  className="text-xl md:text-2xl font-black italic tracking-widest text-primary-container"
+                />
+              </div>
+            </div>
+
             <p className="text-lg md:text-xl text-on-surface-variant max-w-xl font-body leading-relaxed">
               Ubah momen biasa jadi karya seni holographic 3D. Bukan sekedar foto, tapi dimensi baru gaya lo.
             </p>

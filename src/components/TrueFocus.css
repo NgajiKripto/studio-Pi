@@ -1,0 +1,59 @@
+.focus-container {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.focus-word {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  color: white;
+}
+
+.focus-frame {
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 0 15px var(--glow-color);
+  z-index: 10;
+  border-radius: 4px;
+}
+
+.corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--border-color);
+}
+
+.top-left {
+  top: -2px;
+  left: -2px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.top-right {
+  top: -2px;
+  right: -2px;
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.bottom-left {
+  bottom: -2px;
+  left: -2px;
+  border-right: 0;
+  border-top: 0;
+}
+
+.bottom-right {
+  bottom: -2px;
+  right: -2px;
+  border-left: 0;
+  border-top: 0;
+}
