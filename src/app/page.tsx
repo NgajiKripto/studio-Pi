@@ -3,8 +3,20 @@ import Link from 'next/link';
 import { ZepretButton, ZepretCard, ZepretBadge } from '@/components/ZepretUI';
 import { Sparkles, Camera, Zap, Heart, Download, CameraFront } from 'lucide-react';
 import CameraScrollProgress from '@/components/CameraScrollProgress';
+import OrbitImages from '@/components/OrbitImages';
 
 export default function Home() {
+  const communityImages = [
+    'https://picsum.photos/seed/c1/600/800',
+    'https://picsum.photos/seed/c2/600/800',
+    'https://picsum.photos/seed/c3/600/800',
+    'https://picsum.photos/seed/c4/600/800',
+    'https://picsum.photos/seed/c5/600/800',
+    'https://picsum.photos/seed/c6/600/800',
+    'https://picsum.photos/seed/c7/600/800',
+    'https://picsum.photos/seed/c8/600/800',
+  ];
+
   return (
     <main className="min-h-screen bg-background relative overflow-x-hidden">
       {/* Scroll Progress Indicator */}
@@ -108,6 +120,37 @@ export default function Home() {
             <div className="text-5xl font-black text-white">24/7</div>
             <div className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-500">Support</div>
           </div>
+        </div>
+      </section>
+
+      {/* Komunitas Zepret Section */}
+      <section className="py-32 px-6 bg-surface-container-lowest/30 relative">
+        <div className="max-w-7xl mx-auto text-center mb-16">
+          <ZepretBadge color="secondary" className="mb-8">Komunitas Zepret</ZepretBadge>
+          <h2 className="text-4xl md:text-6xl font-headline font-black text-white mb-6">
+            Hasil Zepret <span className="italic text-transparent bg-clip-text bg-gradient-to-br from-secondary to-primary">Teman Kita</span>
+          </h2>
+          <p className="text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+            Lihat gimana serunya teman-teman lo bergaya di Zepret Studio. Kapan giliran lo?
+          </p>
+        </div>
+
+        <div className="relative h-[600px] w-full max-w-6xl mx-auto overflow-hidden">
+          <OrbitImages 
+            images={communityImages}
+            shape="ellipse"
+            radiusX={500}
+            radiusY={200}
+            itemSize={180}
+            duration={60}
+            showPath={true}
+            responsive={true}
+            centerContent={
+              <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center border border-primary/30 backdrop-blur-xl">
+                 <Camera size={40} className="text-primary animate-pulse" />
+              </div>
+            }
+          />
         </div>
       </section>
 
