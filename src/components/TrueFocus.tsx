@@ -29,6 +29,7 @@ const TrueFocus = ({
 }: TrueFocusProps) => {
   const words = sentence.split(separator);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [lastActiveIndex, setLastActiveIndex] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [focusRect, setFocusRect] = useState({ x: 0, y: 0, width: 0, height: 0 });
@@ -52,7 +53,7 @@ const TrueFocus = ({
     const handleGlobalClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       
-      // Don't trigger if clicking on interactive elements like buttons, links, or inputs
+      // Don't trigger if clicking on interactive elements
       if (target.closest('button') || target.closest('a') || target.closest('input')) return;
       
       // Check if the click happened inside the hero section
@@ -85,6 +86,19 @@ const TrueFocus = ({
     }
   }, [currentIndex, words.length]);
 
+  const handleMouseEnter = (index: number) => {
+    if (manualMode) {
+      setLastActiveIndex(currentIndex);
+      setCurrentIndex(index);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (manualMode && lastActiveIndex !== null) {
+      setCurrentIndex(lastActiveIndex);
+    }
+  };
+
   return (
     <div className={`focus-container ${className}`} ref={containerRef}>
       {words.map((word, index) => {
@@ -93,7 +107,7 @@ const TrueFocus = ({
           <span
             key={index}
             ref={el => { wordRefs.current[index] = el; }}
-            className={`focus-word ${isActive ? 'active' : ''}`}
+            className={`focus-word ${manualMode ? 'manual' : ''} ${isActive && !manualMode ? 'active' : ''}`}
             style={{
               filter: isActive ? 'blur(0px)' : `blur(${blurAmount}px)`,
               transition: `filter ${animationDuration}s ease`,
@@ -101,6 +115,8 @@ const TrueFocus = ({
               '--border-color': borderColor,
               '--glow-color': glowColor,
             }}
+            onMouseEnter={() => handleMouseEnter(index)}
+            onMouseLeave={handleMouseLeave}
           >
             {word}
           </span>
@@ -114,6 +130,7 @@ const TrueFocus = ({
           y: focusRect.y,
           width: focusRect.width,
           height: focusRect.height,
+          opacity: currentIndex >= 0 ? 1 : 0
         }}
         transition={{
           duration: animationDuration,

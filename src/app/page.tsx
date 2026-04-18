@@ -94,7 +94,7 @@ export default function Home() {
               <div className="absolute -top-10 -left-10 z-20 animate-floating-3d">
                 <img 
                   className="w-48 h-48 object-contain floating-3d-shadow" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKwcOLPB4OZtFFS-fF1YL4_BkDkoYxHHjd9nxCrgAytW08kK1-kXPmk-9v4kb7XK4UhKUeSuv1rqyYHK3b4v-pVZH82dNz_q5brY35hwYSob0-qzcDNb9mL4Yqtsv6ytwfnS5AYjlZ6iCKglgxRcEghdZjEcRmlXuhgIA3Ieaixr2GYZI7stiw2dKre_oaFTX9TDKizmEmIsMMP-a8zi4GIv3p8-y6SSSb7aBPAtUIdhizElDUvb8Y2FAz9oqfSWwfpfQ_Pdfd_84" 
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKwcOLPB4OZtFFS-fF1YL4_BkDkoYxHHjd9nxCrgAytW08kK1-kXPmk-9v4kb7XK4UhKUeSuv1rqyYHHjd9nxCrgAytW08kK1-kXPmk-9v4kb7XK4UhKUeSuv1rqyYHK3b4v-pVZH82dNz_q5brY35hwYSob0-qzcDNb9mL4Yqtsv6ytwfnS5AYjlZ6iCKglgxRcEghdZjEcRmlXuhgIA3Ieaixr2GYZI7stiw2dKre_oaFTX9TDKizmEmIsMMP-a8zi4GIv3p8-y6SSSb7aBPAtUIdhizElDUvb8Y2FAz9oqfSWwfpfQ_Pdfd_84" 
                   alt="3D Camera" 
                 />
               </div>
