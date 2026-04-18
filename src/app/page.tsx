@@ -1,7 +1,7 @@
 
 import Link from 'next/link';
 import { ZepretButton, ZepretCard, ZepretBadge } from '@/components/ZepretUI';
-import { Sparkles, Camera, Zap, Heart, Download, CameraFront } from 'lucide-react';
+import { Sparkles, Camera, Zap, Heart, Download, CameraFront, Check, X } from 'lucide-react';
 import CameraScrollProgress from '@/components/CameraScrollProgress';
 import OrbitImages from '@/components/OrbitImages';
 
@@ -154,6 +154,65 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Cara Kerja Section */}
+      <section className="py-32 px-6 max-w-7xl mx-auto">
+        <ZepretCard className="bg-surface-container-low border-white/5 p-12 md:p-20 relative overflow-hidden">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-12">
+              <div className="space-y-2 relative">
+                <div className="absolute -top-12 -left-8 text-primary opacity-20 transform -rotate-12">
+                  <span className="material-symbols-outlined text-6xl">filter_center_focus</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-headline font-black text-white">Cara Kerja</h2>
+                <h3 className="text-3xl md:text-4xl font-headline font-black text-tertiary">Zepret Studio</h3>
+              </div>
+              
+              <div className="space-y-10">
+                <div className="flex gap-6 items-start">
+                  <div className="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center font-black text-xl text-primary shrink-0 border border-white/5">1</div>
+                  <div className="space-y-1">
+                    <h4 className="text-xl font-bold text-white">Pilih Paket Gaya</h4>
+                    <p className="text-on-surface-variant leading-relaxed font-body">Sesuaikan durasi dan jumlah aksesoris sesuai kebutuhan konten lo.</p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-6 items-start">
+                  <div className="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center font-black text-xl text-secondary shrink-0 border border-white/5">2</div>
+                  <div className="space-y-1">
+                    <h4 className="text-xl font-bold text-white">Beraksi di Studio</h4>
+                    <p className="text-on-surface-variant leading-relaxed font-body">Pose sesuka hati dengan ribuan filter AI dan stiker 3D interaktif.</p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-6 items-start">
+                  <div className="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center font-black text-xl text-tertiary shrink-0 border border-white/5">3</div>
+                  <div className="space-y-1">
+                    <h4 className="text-xl font-bold text-white">Download & Pamer</h4>
+                    <p className="text-on-surface-variant leading-relaxed font-body">Hasil jepretan langsung masuk ke galeri lo dengan kualitas HD.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="relative group">
+              <div className="absolute -inset-4 bg-tertiary/20 blur-3xl rounded-full opacity-30 group-hover:opacity-60 transition-opacity"></div>
+              <div className="relative rounded-[3rem] overflow-hidden aspect-square border border-white/10 shadow-2xl transition-transform duration-700 group-hover:scale-[1.02]">
+                <img 
+                  className="w-full h-full object-cover" 
+                  src="https://picsum.photos/seed/zepret-working/800/800" 
+                  alt="Zepret Studio Experience" 
+                  data-ai-hint="photobox studio"
+                />
+                <div className="absolute bottom-8 left-8 flex items-center gap-3 bg-primary-container/90 backdrop-blur-md px-6 py-3 rounded-2xl shadow-xl border border-white/20">
+                  <Zap size={20} className="text-white fill-white animate-pulse" />
+                  <span className="font-headline font-black text-white italic tracking-wider text-sm">INSTANT MAGIC</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ZepretCard>
+      </section>
+
       {/* Features Section */}
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-16">
@@ -198,7 +257,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Section (Optional based on UI ref) */}
+      {/* Pricing Section */}
       <section className="py-32 px-6 max-w-7xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-white mb-16">Pilih Paket <span className="text-primary">Gaya Lo</span></h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -206,8 +265,9 @@ export default function Home() {
                 <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Starter</span>
                 <div className="text-4xl font-black text-white mb-8">Rp 25k</div>
                 <ul className="text-sm text-left w-full space-y-4 text-zinc-400 mb-8">
-                  <li>✨ 3 Foto Digital HD</li>
-                  <li>🖼️ Standard 3D Frames</li>
+                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> 3 Foto Digital HD</li>
+                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Standard 3D Frames</li>
+                  <li className="flex items-center gap-2 text-zinc-600 font-medium"><X size={16} /> Aksesoris 3D</li>
                 </ul>
                 <ZepretButton variant="outline" className="w-full">Pilih</ZepretButton>
              </ZepretCard>
@@ -216,9 +276,9 @@ export default function Home() {
                 <span className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Creator</span>
                 <div className="text-5xl font-black text-white mb-8">Rp 75k</div>
                 <ul className="text-sm text-left w-full space-y-4 text-zinc-200 mb-8 font-bold">
-                  <li>✨ 10 Foto Digital HD</li>
-                  <li>🖼️ Unlimited 3D Frames</li>
-                  <li>🕶️ Semua Aksesoris 3D</li>
+                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> 10 Foto Digital HD</li>
+                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Unlimited 3D Frames</li>
+                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Semua Aksesoris 3D</li>
                 </ul>
                 <ZepretButton className="w-full">Ambil Sekarang</ZepretButton>
              </ZepretCard>
@@ -226,12 +286,47 @@ export default function Home() {
                 <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Ultimate</span>
                 <div className="text-4xl font-black text-white mb-8">Rp 150k</div>
                 <ul className="text-sm text-left w-full space-y-4 text-zinc-400 mb-8">
-                  <li>✨ Semua Foto + Video 4K</li>
-                  <li>🖼️ Custom Holographic Aura</li>
+                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Semua Foto + Video 4K</li>
+                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Custom Holographic Aura</li>
+                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Prioritas Studio</li>
                 </ul>
                 <ZepretButton variant="outline" className="w-full">Pilih</ZepretButton>
              </ZepretCard>
           </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-32 px-6 max-w-4xl mx-auto">
+        <h2 className="text-4xl font-headline font-black text-white mb-12 text-center">Ada <span className="text-tertiary">Pertanyaan?</span></h2>
+        <div className="space-y-4">
+          <details className="group glass-panel rounded-lg border border-white/5 overflow-hidden open:border-primary/20 transition-all">
+            <summary className="flex justify-between items-center p-6 cursor-pointer hover:bg-white/5 transition-colors">
+              <span className="text-xl font-bold text-white">Gimana cara dapet filenya?</span>
+              <span className="material-symbols-outlined text-primary group-open:rotate-180 transition-transform">expand_more</span>
+            </summary>
+            <div className="p-6 pt-0 text-on-surface-variant border-t border-white/5 leading-relaxed font-body">
+              Langsung dikirim ke email atau scan QR code di lokasi. Dalam hitungan detik, foto holographic lo siap buat dipamerin di IG atau TikTok.
+            </div>
+          </details>
+          <details className="group glass-panel rounded-lg border border-white/5 overflow-hidden open:border-primary/20 transition-all">
+            <summary className="flex justify-between items-center p-6 cursor-pointer hover:bg-white/5 transition-colors">
+              <span className="text-xl font-bold text-white">Bisa bawa properti sendiri?</span>
+              <span className="material-symbols-outlined text-primary group-open:rotate-180 transition-transform">expand_more</span>
+            </summary>
+            <div className="p-6 pt-0 text-on-surface-variant border-t border-white/5 leading-relaxed font-body">
+              Boleh banget! Tapi tenang, kita udah sediain ribuan aksesoris 3D digital yang bakal bikin look lo makin "level up".
+            </div>
+          </details>
+          <details className="group glass-panel rounded-lg border border-white/5 overflow-hidden open:border-primary/20 transition-all">
+            <summary className="flex justify-between items-center p-6 cursor-pointer hover:bg-white/5 transition-colors">
+              <span className="text-xl font-bold text-white">Lokasi studionya di mana?</span>
+              <span className="material-symbols-outlined text-primary group-open:rotate-180 transition-transform">expand_more</span>
+            </summary>
+            <div className="p-6 pt-0 text-on-surface-variant border-t border-white/5 leading-relaxed font-body">
+              Kita ada di beberapa spot hype di Jakarta, Bandung, dan Surabaya. Cek tab "Studio" buat liat titik persisnya di map.
+            </div>
+          </details>
+        </div>
       </section>
 
       {/* Footer */}
