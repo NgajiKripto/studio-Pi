@@ -114,7 +114,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start gap-4 pt-4">
               <Link href="/studio" className="w-full sm:w-auto">
                 <ZepretButton className="w-full px-10 py-4 md:py-5 text-base md:text-lg">
-                  Fotoin <span className="material-symbols-outlined ml-2">camera_front</span>
+                  Fotoin <Camera className="ml-2 w-5 h-5 md:w-6 md:h-6" />
                 </ZepretButton>
               </Link>
               <ZepretButton variant="glass" className="w-full sm:w-auto px-10 py-4 md:py-5 text-base md:text-lg">
@@ -130,15 +130,17 @@ export default function Home() {
               <div className="absolute -top-6 md:-top-10 -left-6 md:-left-10 z-20 animate-floating-3d">
                 <img 
                   className="w-32 h-32 md:w-48 md:h-48 object-contain floating-3d-shadow" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKwcOLPB4OZtFFS-fF1YL4_BkDkoYxHHjd9nxCrgAytW08kK1-kXPmk-9v4kb7XK4UhKUeSuv1rqyYHHjd9nxCrgAytW08kK1-kXPmk-9v4kb7XK4UhKUeSuv1rqyYHHjd9nxCrgAytW08kK1-kXPmk-9v4kb7XK4UhKUeSuv1rqyYHK3b4v-pVZH82dNz_q5brY35hwYSob0-qzcDNb9mL4Yqtsv6ytwfnS5AYjlZ6iCKglgxRcEghdZjEcRmlXuhgIA3Ieaixr2GYZI7stiw2dKre_oaFTX9TDKizmEmIsMMP-a8zi4GIv3p8-y6SSSb7aBPAtUIdhizElDUvb8Y2FAz9oqfSWwfpfQ_Pdfd_84" 
+                  src="https://picsum.photos/seed/1/400/400" 
                   alt="3D Camera" 
+                  data-ai-hint="3d camera"
                 />
               </div>
               <div className="relative z-10 glass-panel p-3 md:p-4 rounded-lg transform -rotate-3 md:-rotate-6 shadow-2xl border-white/20">
                 <img 
                   className="w-full h-[300px] md:h-[400px] object-cover rounded-lg" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmPbf_xYAkEfmFajPMZEH4kvBY4hJlR9e72z47GK6PJwMJyZR3gSg-p7SCHCQLRRBDlbcgNRoy-zk2WiUFeMOIdIdgujLD-IYu8J3BtydssiG_MoCiX50vfsylzO3K9CTlQcsTCo_FPBbafomr7bLz_5svXHw8Gjy2LNq-Qzw9oH2cnze7dbkxhKdIc2o0KrUSieJfJFtAlblJRpS4CcC4Ifq_OGtVqOAh6JA2sczCq7scm5pOqZT3JD0YBxpuSgJ4Wpag-d_WIxI" 
+                  src="https://picsum.photos/seed/2/600/800" 
                   alt="Gen Z Model" 
+                  data-ai-hint="fashion model"
                 />
                 <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 px-2 md:px-3 py-1 bg-tertiary text-on-tertiary font-bold rounded-md text-[10px] md:text-xs">#ZEPRETFUTURA</div>
               </div>
@@ -220,7 +222,7 @@ export default function Home() {
             <div className="space-y-8 md:space-y-12">
               <div className="space-y-2 relative">
                 <div className="absolute -top-10 -left-6 text-primary opacity-20 transform -rotate-12 hidden md:block">
-                  <span className="material-symbols-outlined text-6xl">filter_center_focus</span>
+                  <Sparkles size={60} />
                 </div>
                 <h2 className="text-3xl md:text-5xl font-headline font-black text-white">Cara Kerja</h2>
                 <h3 className="text-2xl md:text-4xl font-headline font-black text-tertiary">Zepret Studio</h3>
@@ -258,8 +260,9 @@ export default function Home() {
               <div className="relative rounded-2xl md:rounded-[3rem] overflow-hidden aspect-square border border-white/10 shadow-2xl transition-transform duration-700 group-hover:scale-[1.02]">
                 <img 
                   className="w-full h-full object-cover" 
-                  src="https://picsum.photos/seed/zepret-working/800/800" 
+                  src="https://picsum.photos/seed/3/800/800" 
                   alt="Zepret Studio Experience" 
+                  data-ai-hint="photo studio"
                 />
                 <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 flex items-center gap-2 md:gap-3 bg-primary-container/90 backdrop-blur-md px-4 md:px-6 py-2 md:py-3 rounded-xl md:rounded-2xl shadow-xl border border-white/20">
                   <Zap size={16} className="text-white fill-white animate-pulse md:w-5 md:h-5" />
