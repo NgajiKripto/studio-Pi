@@ -1,10 +1,15 @@
+
 import Link from 'next/link';
 import { ZepretButton, ZepretCard, ZepretBadge } from '@/components/ZepretUI';
-import { Sparkles, Camera, Zap, Heart, Download, ExpandMore, CameraFront } from 'lucide-react';
+import { Sparkles, Camera, Zap, Heart, Download, CameraFront } from 'lucide-react';
+import CameraScrollProgress from '@/components/CameraScrollProgress';
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-background relative overflow-x-hidden">
+      {/* Scroll Progress Indicator */}
+      <CameraScrollProgress />
+
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-4 bg-zinc-900/60 backdrop-blur-xl rounded-full mt-6 mx-auto w-[90%] max-w-7xl border border-white/10 shadow-[0_20px_50px_rgba(82,3,213,0.15)]">
         <div className="text-2xl font-black italic text-transparent bg-clip-text bg-gradient-to-br from-[#ffb1c3] to-[#ff5a8f] font-headline">Zepret</div>
@@ -115,6 +120,42 @@ export default function Home() {
           <span className="inline-flex items-center gap-4">ZEPRET!!! <div className="w-4 h-4 bg-secondary rounded-full"></div></span>
           <span className="inline-flex items-center gap-4 text-primary/10">STYLE!!!</span>
         </div>
+      </section>
+
+      {/* Pricing Section (Optional based on UI ref) */}
+      <section className="py-32 px-6 max-w-7xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-white mb-16">Pilih Paket <span className="text-primary">Gaya Lo</span></h2>
+          <div className="grid md:grid-cols-3 gap-8">
+             <ZepretCard className="flex flex-col items-center">
+                <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Starter</span>
+                <div className="text-4xl font-black text-white mb-8">Rp 25k</div>
+                <ul className="text-sm text-left w-full space-y-4 text-zinc-400 mb-8">
+                  <li>✨ 3 Foto Digital HD</li>
+                  <li>🖼️ Standard 3D Frames</li>
+                </ul>
+                <ZepretButton variant="outline" className="w-full">Pilih</ZepretButton>
+             </ZepretCard>
+             <ZepretCard className="flex flex-col items-center border-primary/40 bg-primary/5 scale-105 relative z-10 shadow-[0_0_50px_rgba(255,177,195,0.15)]">
+                <div className="absolute -top-4 bg-primary text-on-primary-fixed px-4 py-1 rounded-full text-[10px] font-black uppercase">Paling Laris</div>
+                <span className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Creator</span>
+                <div className="text-5xl font-black text-white mb-8">Rp 75k</div>
+                <ul className="text-sm text-left w-full space-y-4 text-zinc-200 mb-8 font-bold">
+                  <li>✨ 10 Foto Digital HD</li>
+                  <li>🖼️ Unlimited 3D Frames</li>
+                  <li>🕶️ Semua Aksesoris 3D</li>
+                </ul>
+                <ZepretButton className="w-full">Ambil Sekarang</ZepretButton>
+             </ZepretCard>
+             <ZepretCard className="flex flex-col items-center">
+                <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Ultimate</span>
+                <div className="text-4xl font-black text-white mb-8">Rp 150k</div>
+                <ul className="text-sm text-left w-full space-y-4 text-zinc-400 mb-8">
+                  <li>✨ Semua Foto + Video 4K</li>
+                  <li>🖼️ Custom Holographic Aura</li>
+                </ul>
+                <ZepretButton variant="outline" className="w-full">Pilih</ZepretButton>
+             </ZepretCard>
+          </div>
       </section>
 
       {/* Footer */}
