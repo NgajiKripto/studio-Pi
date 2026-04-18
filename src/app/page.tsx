@@ -50,7 +50,7 @@ export default function Home() {
             
             <div className="space-y-6 relative">
               <TrueFocus 
-                sentence="GAYA LO, FOTO LO, ZEPRET AJA!" 
+                sentence="GAYA, LO, FOTO, LO, ZEPRET, AJA!" 
                 separator=", "
                 manualMode={true}
                 blurAmount={4}
