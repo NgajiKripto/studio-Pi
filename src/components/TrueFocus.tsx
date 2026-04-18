@@ -34,6 +34,7 @@ const TrueFocus = ({
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [focusRect, setFocusRect] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
+  // Automatic cycling
   useEffect(() => {
     if (!manualMode) {
       const interval = setInterval(
@@ -46,6 +47,20 @@ const TrueFocus = ({
       return () => clearInterval(interval);
     }
   }, [manualMode, animationDuration, pauseBetweenAnimations, words.length]);
+
+  // Click-to-focus listener (Global click)
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      // Don't trigger if clicking on interactive elements like buttons or links
+      const target = e.target as HTMLElement;
+      if (target.closest('button') || target.closest('a')) return;
+      
+      setCurrentIndex(prev => (prev + 1) % words.length);
+    };
+
+    window.addEventListener('click', handleGlobalClick);
+    return () => window.removeEventListener('click', handleGlobalClick);
+  }, [words.length]);
 
   useEffect(() => {
     if (currentIndex === null || currentIndex === -1) return;
