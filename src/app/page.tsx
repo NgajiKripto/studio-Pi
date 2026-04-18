@@ -49,19 +49,20 @@ export default function Home() {
               The Holographic Era
             </ZepretBadge>
             
-            <div className="space-y-2">
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-headline font-black leading-tight tracking-tighter text-white uppercase">
-                GAYA LO, FOTO LO, <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary to-primary-container">ZEPRET AJA!</span>
-              </h1>
-              <div className="pt-4">
-                <TrueFocus 
-                  sentence="CAPTURE THE FUTURE MOMENT" 
-                  blurAmount={3}
-                  borderColor="#ff5a8f"
-                  glowColor="rgba(255, 90, 143, 0.4)"
-                  className="text-xl md:text-2xl font-black italic tracking-widest text-primary-container"
-                />
+            <div className="space-y-6">
+              <TrueFocus 
+                sentence="GAYA LO, FOTO LO, ZEPRET AJA!" 
+                separator=", "
+                blurAmount={4}
+                borderColor="#ff5a8f"
+                glowColor="rgba(255, 90, 143, 0.4)"
+                className="text-5xl md:text-7xl lg:text-8xl font-headline font-black leading-tight tracking-tighter text-white uppercase"
+              />
+              
+              <div className="pt-2">
+                <p className="text-xl md:text-2xl font-black italic tracking-widest text-primary-container opacity-80 uppercase">
+                  CAPTURE THE FUTURE MOMENT
+                </p>
               </div>
             </div>
 
