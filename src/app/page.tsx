@@ -258,40 +258,73 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-32 px-6 max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-white mb-16">Pilih Paket <span className="text-primary">Gaya Lo</span></h2>
-          <div className="grid md:grid-cols-3 gap-8">
-             <ZepretCard className="flex flex-col items-center">
-                <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Starter</span>
-                <div className="text-4xl font-black text-white mb-8">Rp 25k</div>
-                <ul className="text-sm text-left w-full space-y-4 text-zinc-400 mb-8">
-                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> 3 Foto Digital HD</li>
-                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Standard 3D Frames</li>
-                  <li className="flex items-center gap-2 text-zinc-600 font-medium"><X size={16} /> Aksesoris 3D</li>
+      <section className="py-32 px-6 max-w-5xl mx-auto text-center">
+          <h2 className="text-4xl md:text-6xl font-headline font-black text-white mb-4">Investasi Untuk <span className="italic text-transparent bg-clip-text bg-gradient-to-br from-primary to-primary-container">Gaya Lo</span></h2>
+          <p className="text-on-surface-variant mb-20">Harga transparan, hasil maksimal. Mulai dari Rp 6.000 saja.</p>
+          
+          <div className="grid md:grid-cols-2 gap-12 items-end max-w-4xl mx-auto">
+             {/* Starter Pack */}
+             <ZepretCard className="relative p-10 flex flex-col items-start text-left group">
+                <ZepretBadge className="mb-6 bg-white/5 border-white/10 text-zinc-400">STARTER PACK</ZepretBadge>
+                <div className="flex justify-between items-end w-full mb-10">
+                   <div className="text-5xl font-black text-white">Rp 6k</div>
+                </div>
+                <ul className="space-y-6 mb-12 w-full">
+                  <li className="flex items-center gap-4 text-zinc-400 font-bold">
+                    <div className="w-6 h-6 rounded-full border border-white/10 flex items-center justify-center">
+                      <Check size={14} />
+                    </div>
+                    5 Menit Sesi
+                  </li>
+                  <li className="flex items-center gap-4 text-zinc-400 font-bold">
+                    <div className="w-6 h-6 rounded-full border border-white/10 flex items-center justify-center">
+                      <Check size={14} />
+                    </div>
+                    Unlimited Captures
+                  </li>
+                  <li className="flex items-center gap-4 text-zinc-400 font-bold">
+                    <div className="w-6 h-6 rounded-full border border-white/10 flex items-center justify-center">
+                      <Check size={14} />
+                    </div>
+                    HD Download
+                  </li>
                 </ul>
-                <ZepretButton variant="outline" className="w-full">Pilih</ZepretButton>
+                <Link href="/studio" className="w-full">
+                  <ZepretButton variant="outline" className="w-full py-4 text-sm tracking-widest uppercase">Pilih Paket</ZepretButton>
+                </Link>
              </ZepretCard>
-             <ZepretCard className="flex flex-col items-center border-primary/40 bg-primary/5 scale-105 relative z-10 shadow-[0_0_50px_rgba(255,177,195,0.15)]">
-                <div className="absolute -top-4 bg-primary text-on-primary-fixed px-4 py-1 rounded-full text-[10px] font-black uppercase">Paling Laris</div>
-                <span className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Creator</span>
-                <div className="text-5xl font-black text-white mb-8">Rp 75k</div>
-                <ul className="text-sm text-left w-full space-y-4 text-zinc-200 mb-8 font-bold">
-                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> 10 Foto Digital HD</li>
-                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Unlimited 3D Frames</li>
-                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Semua Aksesoris 3D</li>
-                </ul>
-                <ZepretButton className="w-full">Ambil Sekarang</ZepretButton>
-             </ZepretCard>
-             <ZepretCard className="flex flex-col items-center">
-                <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Ultimate</span>
-                <div className="text-4xl font-black text-white mb-8">Rp 150k</div>
-                <ul className="text-sm text-left w-full space-y-4 text-zinc-400 mb-8">
-                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Semua Foto + Video 4K</li>
-                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Custom Holographic Aura</li>
-                  <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Prioritas Studio</li>
-                </ul>
-                <ZepretButton variant="outline" className="w-full">Pilih</ZepretButton>
-             </ZepretCard>
+
+             {/* Pro Zepret */}
+             <div className="relative group">
+               <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+                 <div className="bg-primary px-6 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-on-primary-fixed shadow-[0_0_20px_rgba(255,177,195,0.4)]">
+                   REKOMENDASI
+                 </div>
+               </div>
+               <ZepretCard className="p-10 flex flex-col items-start text-left border-2 border-primary/40 bg-primary/5 shadow-[0_0_50px_rgba(255,177,195,0.1)] relative">
+                  <ZepretBadge className="mb-6 bg-primary/10 border-primary/20 text-primary">PRO ZEPRET</ZepretBadge>
+                  <div className="flex justify-between items-end w-full mb-10">
+                    <div className="text-5xl font-black text-white">Rp 12k</div>
+                  </div>
+                  <ul className="space-y-6 mb-12 w-full">
+                    <li className="flex items-center gap-4 text-white font-bold">
+                      <Heart size={20} className="text-primary fill-primary/20" />
+                      10 Menit Sesi
+                    </li>
+                    <li className="flex items-center gap-4 text-white font-bold">
+                      <Heart size={20} className="text-primary fill-primary/20" />
+                      Free 3 Aksesoris 3D
+                    </li>
+                    <li className="flex items-center gap-4 text-white font-bold">
+                      <Heart size={20} className="text-primary fill-primary/20" />
+                      Cloud Storage 7 Hari
+                    </li>
+                  </ul>
+                  <Link href="/studio" className="w-full">
+                    <ZepretButton className="w-full py-4 text-sm tracking-widest uppercase shadow-[0_15px_30px_rgba(255,90,143,0.3)]">Pilih Paket</ZepretButton>
+                  </Link>
+               </ZepretCard>
+             </div>
           </div>
       </section>
 

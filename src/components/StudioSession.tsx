@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -147,11 +148,11 @@ export default function StudioSession() {
             <ZepretCard className="flex flex-col items-center space-y-6 group hover:border-primary/40">
               <ZepretBadge>Starter Pack</ZepretBadge>
               <h3 className="text-4xl font-black">Rp 6k</h3>
-              <p className="text-on-surface-variant font-bold">5 Menit Zepret</p>
+              <p className="text-on-surface-variant font-bold">5 Menit Sesi</p>
               <ul className="text-left space-y-3 w-full">
                 <li className="flex items-center gap-2"><Check className="text-primary" size={20} /> Unlimited Snaps</li>
                 <li className="flex items-center gap-2"><Check className="text-primary" size={20} /> Standard Frames</li>
-                <li className="flex items-center gap-2 text-zinc-600"><X size={20} /> AI Pose Guide</li>
+                <li className="flex items-center gap-2 text-zinc-600"><X size={20} /> HD Download</li>
               </ul>
               <ZepretButton variant="outline" onClick={() => handlePackageSelect('5min')} className="w-full">
                 Pilih Ini
@@ -160,13 +161,13 @@ export default function StudioSession() {
 
             <ZepretCard className="flex flex-col items-center space-y-6 bg-primary-container/5 border-primary/50 relative overflow-hidden">
               <div className="absolute top-4 right-4 rotate-12 bg-primary px-3 py-1 text-[10px] font-black uppercase rounded text-on-primary-fixed">Hype</div>
-              <ZepretBadge color="tertiary">Creator Mode</ZepretBadge>
+              <ZepretBadge color="tertiary">Pro Zepret</ZepretBadge>
               <h3 className="text-4xl font-black">Rp 12k</h3>
-              <p className="text-on-surface-variant font-bold">10 Menit Zepret</p>
+              <p className="text-on-surface-variant font-bold">10 Menit Sesi</p>
               <ul className="text-left space-y-3 w-full">
                 <li className="flex items-center gap-2"><Check className="text-tertiary" size={20} /> Unlimited Snaps</li>
-                <li className="flex items-center gap-2"><Check className="text-tertiary" size={20} /> All Premium Frames</li>
-                <li className="flex items-center gap-2"><Check className="text-tertiary" size={20} /> AI Pose Guide</li>
+                <li className="flex items-center gap-2"><Check className="text-tertiary" size={20} /> Free 3 Aksesoris 3D</li>
+                <li className="flex items-center gap-2"><Check className="text-tertiary" size={20} /> Cloud Storage 7 Hari</li>
               </ul>
               <ZepretButton onClick={() => handlePackageSelect('10min')} className="w-full">
                 Sikat!
