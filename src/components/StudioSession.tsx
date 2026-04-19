@@ -21,6 +21,7 @@ export default function StudioSession() {
   const [packageType, setPackageType] = useState<'5min' | '10min' | null>(null);
   const [activeFrame, setActiveFrame] = useState(PlaceHolderImages[0].imageUrl);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [captureCountdown, setCaptureCountdown] = useState<number | null>(null);
   const [aiSuggestion, setAiSuggestion] = useState<string>('');
   const [isLoadingAi, setIsLoadingAi] = useState(false);
   const [socialSuggestions, setSocialSuggestions] = useState<{captions: string[], hashtags: string[]} | null>(null);
@@ -84,10 +85,29 @@ export default function StudioSession() {
     setStep('session');
   };
 
+  const startCaptureCountdown = () => {
+    if (captureCountdown !== null) return; // Prevent multiple countdowns
+    setCaptureCountdown(5);
+
+    let count = 5;
+    const timer = setInterval(() => {
+      count -= 1;
+      setCaptureCountdown(count);
+
+      if (count === 0) {
+        clearInterval(timer);
+        capturePhoto();
+      }
+    }, 1000);
+  };
+
   const capturePhoto = async () => {
     if (!videoRef.current || !canvasRef.current) return;
     setIsCapturing(true);
     
+    // Reset countdown state
+    setCaptureCountdown(null);
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (ctx) {
@@ -252,6 +272,12 @@ export default function StudioSession() {
                 <div className="absolute inset-0 bg-white animate-pulse z-50" />
               )}
 
+              {captureCountdown !== null && captureCountdown > 0 && (
+                <div className="absolute inset-0 flex items-center justify-center text-[10rem] md:text-[15rem] font-black text-white/50 z-50 pointer-events-none drop-shadow-2xl">
+                  {captureCountdown}
+                </div>
+              )}
+
               <div className="absolute top-4 left-4 md:top-6 md:left-6">
                 <div className={cn(
                   "glass-panel px-4 py-1.5 md:px-6 md:py-2 flex items-center gap-2 md:gap-3 font-headline font-bold rounded-full text-sm md:text-base",
@@ -274,8 +300,8 @@ export default function StudioSession() {
 
               <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2">
                 <button
-                  onClick={capturePhoto}
-                  disabled={isCapturing}
+                  onClick={startCaptureCountdown}
+                  disabled={isCapturing || captureCountdown !== null}
                   className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-primary to-primary-container p-1 rounded-full shadow-[0_0_20px_rgba(255,90,143,0.5)] md:shadow-[0_0_30px_rgba(255,90,143,0.5)] hover:scale-105 active:scale-95 transition-all group"
                 >
                   <div className="w-full h-full rounded-full border-2 md:border-4 border-white/30 flex items-center justify-center">
