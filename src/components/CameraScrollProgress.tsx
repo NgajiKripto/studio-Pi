@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
 export default function CameraScrollProgress() {
   const [scrollPercent, setScrollPercent] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => {
+    let animationFrameId: number;
+
+    const updateScroll = () => {
       const winScroll = window.scrollY;
       const docHeight = document.documentElement.scrollHeight;
       const winHeight = window.innerHeight;
@@ -16,13 +18,26 @@ export default function CameraScrollProgress() {
       setScrollPercent(scrolled);
     };
 
+    const handleScroll = () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      animationFrameId = requestAnimationFrame(updateScroll);
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial check
-    return () => window.removeEventListener('scroll', handleScroll);
+    updateScroll(); // Initial check
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, []);
 
   // Generate sequence from 1 to 100
-  const markers = Array.from({ length: 100 }, (_, i) => i + 1);
+  const markers = useMemo(() => Array.from({ length: 100 }, (_, i) => i + 1), []);
 
   return (
     <div className="fixed right-2 md:right-4 top-1/2 -translate-y-1/2 z-[100] flex flex-col items-center pointer-events-none select-none">
