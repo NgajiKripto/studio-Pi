@@ -1,4 +1,4 @@
-'use server';
+"use server";
 /**
  * @fileOverview An AI-powered style assistant that suggests trending or personalized frame designs and sticker arrangements
  * based on popular styles or photo context for the Zepret photobox app.
@@ -8,8 +8,8 @@
  * - AiStyleAssistantOutput - The return type for the aiStyleAssistant function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from "@/ai/genkit";
+import { z } from "genkit";
 
 /**
  * Input schema for the AI style assistant flow.
@@ -17,14 +17,16 @@ import {z} from 'genkit';
 const AiStyleAssistantInputSchema = z.object({
   photoDataUri: z
     .string()
+    .startsWith("data:image/", { message: "Must be a valid image data URI" })
     .describe(
-      "A photo of the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+      "A photo of the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'.",
     ),
   desiredStyle: z
     .string()
+    .max(500, { message: "Desired style string is too long" })
     .optional()
     .describe(
-      'An optional string describing the user\'s desired style (e.g., "vintage", "futuristic", "minimalist", "bold", "playful"). If not provided, suggest trending Neobrutalist styles.'
+      'An optional string describing the user\'s desired style (e.g., "vintage", "futuristic", "minimalist", "bold", "playful"). If not provided, suggest trending Neobrutalist styles.',
     ),
 });
 export type AiStyleAssistantInput = z.infer<typeof AiStyleAssistantInputSchema>;
@@ -33,16 +35,16 @@ export type AiStyleAssistantInput = z.infer<typeof AiStyleAssistantInputSchema>;
  * Schema for a suggested frame design.
  */
 const FrameSuggestionSchema = z.object({
-  name: z.string().describe('The name or type of the suggested frame design.'),
+  name: z.string().describe("The name or type of the suggested frame design."),
   description: z
     .string()
     .describe(
-      'A detailed description of the frame design, including its visual characteristics (e.g., color, border thickness, shadows, typography) adhering to Neobrutalism.'
+      "A detailed description of the frame design, including its visual characteristics (e.g., color, border thickness, shadows, typography) adhering to Neobrutalism.",
     ),
   styleKeywords: z
     .array(z.string())
     .describe(
-      'Keywords describing the style of the frame (e.g., "Neobrutalism", "Bold", "Geometric", "Pink", "Retro").'
+      'Keywords describing the style of the frame (e.g., "Neobrutalism", "Bold", "Geometric", "Pink", "Retro").',
     ),
 });
 
@@ -50,16 +52,20 @@ const FrameSuggestionSchema = z.object({
  * Schema for a suggested sticker arrangement.
  */
 const StickerSuggestionSchema = z.object({
-  name: z.string().describe('The name or type of the suggested sticker (e.g., "Star", "Arrow", "Speech Bubble").'),
+  name: z
+    .string()
+    .describe(
+      'The name or type of the suggested sticker (e.g., "Star", "Arrow", "Speech Bubble").',
+    ),
   description: z
     .string()
     .describe(
-      'A detailed description of the sticker, its appearance, and suggested placement/arrangement relative to the photo or other stickers.'
+      "A detailed description of the sticker, its appearance, and suggested placement/arrangement relative to the photo or other stickers.",
     ),
   styleKeywords: z
     .array(z.string())
     .describe(
-      'Keywords describing the style of the sticker (e.g., "Neobrutalism", "Abstract", "Text", "Pink Accent").'
+      'Keywords describing the style of the sticker (e.g., "Neobrutalism", "Abstract", "Text", "Pink Accent").',
     ),
 });
 
@@ -68,20 +74,22 @@ const StickerSuggestionSchema = z.object({
  */
 const AiStyleAssistantOutputSchema = z.object({
   frameSuggestion: FrameSuggestionSchema.describe(
-    'A suggestion for a photo frame design.'
+    "A suggestion for a photo frame design.",
   ),
   stickerArrangements: z
     .array(StickerSuggestionSchema)
     .describe(
-      'An array of suggestions for 3D sticker arrangements, including their type, appearance, and proposed placement on the photo.'
+      "An array of suggestions for 3D sticker arrangements, including their type, appearance, and proposed placement on the photo.",
     ),
   overallStyleRecommendation: z
     .string()
     .describe(
-      'A brief overall recommendation for the aesthetic based on the photo and desired style, emphasizing Neobrutalism elements.'
+      "A brief overall recommendation for the aesthetic based on the photo and desired style, emphasizing Neobrutalism elements.",
     ),
 });
-export type AiStyleAssistantOutput = z.infer<typeof AiStyleAssistantOutputSchema>;
+export type AiStyleAssistantOutput = z.infer<
+  typeof AiStyleAssistantOutputSchema
+>;
 
 /**
  * Calls the AI style assistant Genkit flow to suggest frame designs and sticker arrangements.
@@ -89,7 +97,7 @@ export type AiStyleAssistantOutput = z.infer<typeof AiStyleAssistantOutputSchema
  * @returns A promise that resolves to the AI-generated style suggestions.
  */
 export async function aiStyleAssistant(
-  input: AiStyleAssistantInput
+  input: AiStyleAssistantInput,
 ): Promise<AiStyleAssistantOutput> {
   return aiStyleAssistantFlow(input);
 }
@@ -98,7 +106,7 @@ export async function aiStyleAssistant(
  * Genkit prompt definition for the style assistant.
  */
 const styleAssistantPrompt = ai.definePrompt({
-  name: 'styleAssistantPrompt',
+  name: "styleAssistantPrompt",
   input: { schema: AiStyleAssistantInputSchema },
   output: { schema: AiStyleAssistantOutputSchema },
   prompt: `You are an AI-powered style assistant for Zepret, a photobox app targeting Gen Z with a Neobrutalism aesthetic.
@@ -134,15 +142,15 @@ Provide your suggestions in JSON format as per the output schema.
  */
 const aiStyleAssistantFlow = ai.defineFlow(
   {
-    name: 'aiStyleAssistantFlow',
+    name: "aiStyleAssistantFlow",
     inputSchema: AiStyleAssistantInputSchema,
     outputSchema: AiStyleAssistantOutputSchema,
   },
   async (input) => {
     const { output } = await styleAssistantPrompt(input);
     if (!output) {
-      throw new Error('Failed to get style suggestions from AI.');
+      throw new Error("Failed to get style suggestions from AI.");
     }
     return output;
-  }
+  },
 );

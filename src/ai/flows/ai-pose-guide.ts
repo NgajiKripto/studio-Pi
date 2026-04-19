@@ -1,4 +1,4 @@
-'use server';
+"use server";
 /**
  * @fileOverview An AI agent that provides real-time pose and expression suggestions.
  *
@@ -7,20 +7,22 @@
  * - AiPoseGuideOutput - The return type for the aiPoseGuide function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from "@/ai/genkit";
+import { z } from "genkit";
 
 const AiPoseGuideInputSchema = z.object({
   photoDataUri: z
     .string()
+    .startsWith("data:image/", { message: "Must be a valid image data URI" })
     .describe(
-      "A photo of the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'. This is used to understand the current pose and context."
+      "A photo of the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'. This is used to understand the current pose and context.",
     ),
   currentContext: z
     .string()
+    .max(500, { message: "Context is too long" })
     .optional()
     .describe(
-      'Optional text providing context about the current photo session, e.g., "taking a selfie with friends" or "trying to look cool and casual".'
+      'Optional text providing context about the current photo session, e.g., "taking a selfie with friends" or "trying to look cool and casual".',
     ),
 });
 export type AiPoseGuideInput = z.infer<typeof AiPoseGuideInputSchema>;
@@ -28,18 +30,22 @@ export type AiPoseGuideInput = z.infer<typeof AiPoseGuideInputSchema>;
 const AiPoseGuideOutputSchema = z.object({
   suggestion: z
     .string()
-    .describe('A creative and encouraging suggestion for a pose or expression.'),
+    .describe(
+      "A creative and encouraging suggestion for a pose or expression.",
+    ),
 });
 export type AiPoseGuideOutput = z.infer<typeof AiPoseGuideOutputSchema>;
 
-export async function aiPoseGuide(input: AiPoseGuideInput): Promise<AiPoseGuideOutput> {
+export async function aiPoseGuide(
+  input: AiPoseGuideInput,
+): Promise<AiPoseGuideOutput> {
   return aiPoseGuideFlow(input);
 }
 
 const prompt = ai.definePrompt({
-  name: 'aiPoseGuidePrompt',
-  input: {schema: AiPoseGuideInputSchema},
-  output: {schema: AiPoseGuideOutputSchema},
+  name: "aiPoseGuidePrompt",
+  input: { schema: AiPoseGuideInputSchema },
+  output: { schema: AiPoseGuideOutputSchema },
   prompt: `You are Zepret AI, a friendly and energetic assistant specializing in guiding Gen Z users to capture amazing photos with creative poses and expressions. Your goal is to inspire and provide easy-to-follow suggestions for dynamic and engaging photos.
 
 Analyze the provided image and the current context (if available) to offer a fresh pose or expression suggestion. Focus on making the user feel confident and look their best, aligning with trendy, Neobrutalism aesthetics, and a fun, energetic vibe.
@@ -52,12 +58,12 @@ Photo: {{media url=photoDataUri}}`,
 
 const aiPoseGuideFlow = ai.defineFlow(
   {
-    name: 'aiPoseGuideFlow',
+    name: "aiPoseGuideFlow",
     inputSchema: AiPoseGuideInputSchema,
     outputSchema: AiPoseGuideOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
+  async (input) => {
+    const { output } = await prompt(input);
     return output!;
-  }
+  },
 );
