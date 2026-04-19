@@ -33,15 +33,29 @@ export default function StudioSession() {
 
   const requestCamera = async () => {
     try {
-      const s = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" }, audio: false });
+      const s = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 1280 }, 
+          height: { ideal: 720 }, 
+          facingMode: "user" 
+        }, 
+        audio: false 
+      });
       setStream(s);
-      if (videoRef.current) videoRef.current.srcObject = s;
       setStep('terms');
     } catch (err) {
       alert('Akses kamera ditolak. Plis izinin biar bisa Zepret!');
     }
   };
 
+  // Sync stream to video element whenever step becomes 'session'
+  useEffect(() => {
+    if (step === 'session' && stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [step, stream]);
+
+  // Handle timer for the session
   useEffect(() => {
     if (step === 'session' && timeLeft > 0) {
       const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
@@ -51,6 +65,15 @@ export default function StudioSession() {
     }
   }, [step, timeLeft]);
 
+  // Clean up stream on unmount
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
+
   const handlePackageSelect = (type: '5min' | '10min') => {
     setPackageType(type);
     setStep('payment');
@@ -59,9 +82,6 @@ export default function StudioSession() {
   const handlePaymentComplete = () => {
     setTimeLeft(packageType === '5min' ? 300 : 600);
     setStep('session');
-    if (stream && videoRef.current) {
-        videoRef.current.srcObject = stream;
-    }
   };
 
   const capturePhoto = async () => {
@@ -73,8 +93,10 @@ export default function StudioSession() {
     if (ctx) {
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
+      // Mirror the capture to match the mirrored preview
+      ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
-      ctx.drawImage(videoRef.current, -canvas.width, 0, canvas.width, canvas.height);
+      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
       const dataUri = canvas.toDataURL('image/jpeg');
       setCapturedPhotos(prev => [dataUri, ...prev]);
       
@@ -188,7 +210,7 @@ export default function StudioSession() {
                 <li className="flex items-center gap-2"><Check className="text-tertiary" size={18} /> Free 3 Aksesoris 3D</li>
                 <li className="flex items-center gap-2"><Check className="text-tertiary" size={18} /> Cloud Storage 7 Hari</li>
               </ul>
-              <ZepretButton onClick={handlePackageSelect.bind(null, '10min')} className="w-full">
+              <ZepretButton onClick={() => handlePackageSelect('10min')} className="w-full">
                 Sikat!
               </ZepretButton>
             </ZepretCard>
