@@ -1,4 +1,4 @@
-'use server';
+"use server";
 /**
  * @fileOverview A Genkit flow for generating social media captions and hashtags based on user photos.
  *
@@ -7,20 +7,22 @@
  * - AiSocialShareSuggestionsOutput - The return type for the generateSocialShareSuggestions function.
  */
 
-import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { ai } from "@/ai/genkit";
+import { z } from "genkit";
 
 const AiSocialShareSuggestionsInputSchema = z.object({
   photoDataUri: z
     .string()
+    .startsWith("data:image/", { message: "Must be a valid image data URI" })
     .describe(
-      "A photo of the user's Zepret creation, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+      "A photo of the user's Zepret creation, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'.",
     ),
   contextDescription: z
     .string()
+    .max(500, { message: "Context description is too long" })
     .optional()
     .describe(
-      'An optional description providing context about the photo or the photo session, to help the AI generate more relevant suggestions.'
+      "An optional description providing context about the photo or the photo session, to help the AI generate more relevant suggestions.",
     ),
 });
 export type AiSocialShareSuggestionsInput = z.infer<
@@ -30,23 +32,23 @@ export type AiSocialShareSuggestionsInput = z.infer<
 const AiSocialShareSuggestionsOutputSchema = z.object({
   captions: z
     .array(z.string())
-    .describe('A list of suggested social media captions.'),
+    .describe("A list of suggested social media captions."),
   hashtags: z
     .array(z.string())
-    .describe('A list of suggested relevant hashtags.'),
+    .describe("A list of suggested relevant hashtags."),
 });
 export type AiSocialShareSuggestionsOutput = z.infer<
   typeof AiSocialShareSuggestionsOutputSchema
 >;
 
 export async function generateSocialShareSuggestions(
-  input: AiSocialShareSuggestionsInput
+  input: AiSocialShareSuggestionsInput,
 ): Promise<AiSocialShareSuggestionsOutput> {
   return aiSocialShareSuggestionsFlow(input);
 }
 
 const prompt = ai.definePrompt({
-  name: 'socialShareSuggestionsPrompt',
+  name: "socialShareSuggestionsPrompt",
   input: { schema: AiSocialShareSuggestionsInputSchema },
   output: { schema: AiSocialShareSuggestionsOutputSchema },
   prompt: `You are a social media expert specializing in trending content for Gen Z.
@@ -59,15 +61,15 @@ Photo: {{media url=photoDataUri}}`,
 
 const aiSocialShareSuggestionsFlow = ai.defineFlow(
   {
-    name: 'aiSocialShareSuggestionsFlow',
+    name: "aiSocialShareSuggestionsFlow",
     inputSchema: AiSocialShareSuggestionsInputSchema,
     outputSchema: AiSocialShareSuggestionsOutputSchema,
   },
   async (input) => {
     const { output } = await prompt(input);
     if (!output) {
-      throw new Error('Failed to generate social share suggestions.');
+      throw new Error("Failed to generate social share suggestions.");
     }
     return output;
-  }
+  },
 );
