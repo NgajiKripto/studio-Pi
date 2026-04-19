@@ -284,8 +284,8 @@ export default function StudioSession() {
               )}
 
               {countdown !== null && (
-                <div className="absolute inset-0 flex items-center justify-center z-40 bg-black/30 backdrop-blur-sm">
-                  <span className="text-8xl md:text-9xl font-headline font-black text-white animate-bounce shadow-2xl">
+                <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+                  <span className="text-8xl md:text-9xl font-headline font-black text-white/50 animate-bounce drop-shadow-[0_0_10px_rgba(0,0,0,0.5)]">
                     {countdown}
                   </span>
                 </div>
