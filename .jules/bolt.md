@@ -1,3 +1,7 @@
 ## 2025-04-19 - Scroll Event Listener Performance Optimization
 **Learning:** Using synchronous state updates in high-frequency scroll event listeners is an anti-pattern. Continuous scroll events trigger `setState` directly, causing layout thrashing and unnecessary re-renders that can drop frames and stutter UI animations (like the ones built with Framer Motion or heavy CSS transitions).
 **Action:** Always throttle or debounce high-frequency events like `scroll` or `mousemove` using `window.requestAnimationFrame`. Moreover, avoid inline array/object allocations in components that update frequently, by extracting them or wrapping them in `useMemo`.
+
+## 2025-04-19 - Countdown Interval Memory Leak Prevention
+**Learning:** Using `setInterval` inside a component method (like a button click handler) without cleaning it up can lead to memory leaks and React state update errors if the component unmounts before the interval finishes.
+**Action:** Always store interval IDs in a `useRef` (e.g., `countdownIntervalRef.current = setInterval(...)`) and explicitly clear the interval both when it finishes naturally and inside a `useEffect` cleanup function that runs on component unmount.

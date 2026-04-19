@@ -21,8 +21,10 @@ export default function StudioSession() {
   const [packageType, setPackageType] = useState<'5min' | '10min' | null>(null);
   const [activeFrame, setActiveFrame] = useState(PlaceHolderImages[0].imageUrl);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const [aiSuggestion, setAiSuggestion] = useState<string>('');
   const [isLoadingAi, setIsLoadingAi] = useState(false);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [socialSuggestions, setSocialSuggestions] = useState<{captions: string[], hashtags: string[]} | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -83,6 +85,35 @@ export default function StudioSession() {
     setTimeLeft(packageType === '5min' ? 300 : 600);
     setStep('session');
   };
+
+  const startCountdownAndCapture = () => {
+    if (countdown !== null) return;
+
+    setCountdown(5);
+    let currentCount = 5;
+
+    countdownIntervalRef.current = setInterval(() => {
+      currentCount -= 1;
+      if (currentCount > 0) {
+        setCountdown(currentCount);
+      } else {
+        if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+        }
+        setCountdown(null);
+        capturePhoto();
+      }
+    }, 1000);
+  };
+
+  useEffect(() => {
+    return () => {
+        if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+        }
+    }
+  }, []);
 
   const capturePhoto = async () => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -252,6 +283,14 @@ export default function StudioSession() {
                 <div className="absolute inset-0 bg-white animate-pulse z-50" />
               )}
 
+              {countdown !== null && (
+                <div className="absolute inset-0 flex items-center justify-center z-40 bg-black/30 backdrop-blur-sm">
+                  <span className="text-8xl md:text-9xl font-headline font-black text-white animate-bounce shadow-2xl">
+                    {countdown}
+                  </span>
+                </div>
+              )}
+
               <div className="absolute top-4 left-4 md:top-6 md:left-6">
                 <div className={cn(
                   "glass-panel px-4 py-1.5 md:px-6 md:py-2 flex items-center gap-2 md:gap-3 font-headline font-bold rounded-full text-sm md:text-base",
@@ -272,11 +311,11 @@ export default function StudioSession() {
                 </div>
               )}
 
-              <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2">
+              <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50">
                 <button
-                  onClick={capturePhoto}
-                  disabled={isCapturing}
-                  className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-primary to-primary-container p-1 rounded-full shadow-[0_0_20px_rgba(255,90,143,0.5)] md:shadow-[0_0_30px_rgba(255,90,143,0.5)] hover:scale-105 active:scale-95 transition-all group"
+                  onClick={startCountdownAndCapture}
+                  disabled={isCapturing || countdown !== null}
+                  className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-primary to-primary-container p-1 rounded-full shadow-[0_0_20px_rgba(255,90,143,0.5)] md:shadow-[0_0_30px_rgba(255,90,143,0.5)] hover:scale-105 active:scale-95 transition-all group disabled:opacity-50 disabled:pointer-events-none"
                 >
                   <div className="w-full h-full rounded-full border-2 md:border-4 border-white/30 flex items-center justify-center">
                     <div className="w-10 h-10 md:w-16 md:h-16 bg-white rounded-full group-active:bg-tertiary transition-colors" />
