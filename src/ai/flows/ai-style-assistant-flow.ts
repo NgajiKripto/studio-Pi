@@ -17,11 +17,14 @@ import {z} from 'genkit';
 const AiStyleAssistantInputSchema = z.object({
   photoDataUri: z
     .string()
+    .regex(/^data:image\/(png|jpeg|jpg|webp);base64,/, 'Must be a valid base64 image data URI')
+    .max(10_000_000, 'Image data is too large')
     .describe(
       "A photo of the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
   desiredStyle: z
     .string()
+    .max(500, 'Desired style is too long')
     .optional()
     .describe(
       'An optional string describing the user\'s desired style (e.g., "vintage", "futuristic", "minimalist", "bold", "playful"). If not provided, suggest trending Neobrutalist styles.'
