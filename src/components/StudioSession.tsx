@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ZepretButton, ZepretCard, ZepretBadge } from '@/components/ZepretUI';
-import { Camera, Timer, X, Sparkles, Check, Download, Share2, Wand2, ChevronRight, AlertCircle } from 'lucide-react';
+import { Camera, Timer, X, Sparkles, Check, Download, Share2, AlertCircle } from 'lucide-react';
 import { aiPoseGuide } from '@/ai/flows/ai-pose-guide';
 import { generateSocialShareSuggestions } from '@/ai/flows/ai-social-share-suggestions';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -10,8 +10,79 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Step = 'permission' | 'terms' | 'package' | 'payment' | 'session' | 'review';
+type CameraFilterId = 'none' | 'bw' | 'silhouette' | 'mist' | 'infrared' | 'doubleExposure' | 'bokeh';
 
 const STEPS: Step[] = ['permission', 'terms', 'package', 'payment', 'session', 'review'];
+const ADVANCED_FILTERS: CameraFilterId[] = ['infrared', 'doubleExposure', 'bokeh'];
+
+const FILTER_OPTIONS: Array<{ id: CameraFilterId; label: string; category: string }> = [
+  { id: 'none', label: 'Original', category: 'Default' },
+  { id: 'bw', label: 'Black & White', category: 'CSS' },
+  { id: 'silhouette', label: 'Siluet', category: 'CSS' },
+  { id: 'mist', label: 'Fog / Mist', category: 'CSS' },
+  { id: 'infrared', label: 'Infrared', category: 'Canvas' },
+  { id: 'doubleExposure', label: 'Double Exposure', category: 'Canvas' },
+  { id: 'bokeh', label: 'Bokeh AI', category: 'AI/ML' },
+];
+
+const drawMirroredFrame = (ctx: CanvasRenderingContext2D, video: HTMLVideoElement, width: number, height: number) => {
+  ctx.save();
+  ctx.translate(width, 0);
+  ctx.scale(-1, 1);
+  ctx.drawImage(video, 0, 0, width, height);
+  ctx.restore();
+};
+
+const applyInfraredMapping = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const pixels = imageData.data;
+
+  for (let i = 0; i < pixels.length; i += 4) {
+    const r = pixels[i];
+    const g = pixels[i + 1];
+    const b = pixels[i + 2];
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    pixels[i] = Math.min(255, luminance * 380); // red
+    pixels[i + 1] = Math.min(255, Math.pow(luminance, 1.7) * 255); // green
+    pixels[i + 2] = Math.min(255, (1 - luminance) * 220 + 25); // blue
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+};
+
+const drawGeneratedBackground = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+  const gradient = ctx.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, '#25053f');
+  gradient.addColorStop(0.5, '#5203d5');
+  gradient.addColorStop(1, '#ff5a8f');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+
+  const glow = ctx.createRadialGradient(width * 0.7, height * 0.3, 20, width * 0.7, height * 0.3, width * 0.7);
+  glow.addColorStop(0, 'rgba(255,255,255,0.25)');
+  glow.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, width, height);
+};
+
+const drawWithCanvasFilter = (ctx: CanvasRenderingContext2D, filter: string, draw: () => void) => {
+  const previous = ctx.filter;
+  ctx.filter = filter;
+  draw();
+  ctx.filter = previous;
+};
+
+declare global {
+  interface Window {
+    SelfieSegmentation?: new (options: { locateFile: (file: string) => string }) => {
+      setOptions: (options: { modelSelection: number }) => void;
+      onResults: (callback: (results: { segmentationMask?: HTMLCanvasElement }) => void) => void;
+      send: (payload: { image: HTMLVideoElement }) => Promise<void>;
+      close?: () => void;
+    };
+  }
+}
 
 export default function StudioSession() {
   const [step, setStep] = useState<Step>('permission');
@@ -25,12 +96,114 @@ export default function StudioSession() {
   const [aiSuggestion, setAiSuggestion] = useState<string>('');
   const [isLoadingAi, setIsLoadingAi] = useState(false);
   const [socialSuggestions, setSocialSuggestions] = useState<{captions: string[], hashtags: string[]} | null>(null);
+  const [activeFilter, setActiveFilter] = useState<CameraFilterId>('none');
+  const [isBokehModelReady, setIsBokehModelReady] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+  const bokehMaskCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const selfieSegmentationRef = useRef<InstanceType<NonNullable<typeof window.SelfieSegmentation>> | null>(null);
+  const segmentationPendingRef = useRef(false);
+  const sharpFrameCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const blurredFrameCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const foregroundCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const currentStepIndex = STEPS.indexOf(step);
   const progressPercent = ((currentStepIndex + 1) / STEPS.length) * 100;
+  const requiresCanvasPreview = ADVANCED_FILTERS.includes(activeFilter);
+  const previewCssFilter = activeFilter === 'bw'
+    ? 'grayscale(1)'
+    : activeFilter === 'silhouette'
+      ? 'contrast(2.8) brightness(0.45)'
+      : 'none';
+
+  const drawPhotoWithActiveFilter = useCallback(async (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    sourceVideo: HTMLVideoElement
+  ) => {
+    ctx.clearRect(0, 0, width, height);
+
+    if (activeFilter === 'bw' || activeFilter === 'silhouette') {
+      drawWithCanvasFilter(ctx, previewCssFilter, () => drawMirroredFrame(ctx, sourceVideo, width, height));
+      return;
+    }
+
+    if (activeFilter === 'mist') {
+      drawWithCanvasFilter(ctx, 'saturate(1.05) contrast(1.05)', () => drawMirroredFrame(ctx, sourceVideo, width, height));
+      drawWithCanvasFilter(ctx, 'blur(2px)', () => drawMirroredFrame(ctx, sourceVideo, width, height));
+      const mistLayer = ctx.createLinearGradient(0, 0, 0, height);
+      mistLayer.addColorStop(0, 'rgba(255,255,255,0.24)');
+      mistLayer.addColorStop(1, 'rgba(228,240,255,0.08)');
+      ctx.fillStyle = mistLayer;
+      ctx.fillRect(0, 0, width, height);
+      return;
+    }
+
+    if (activeFilter === 'infrared') {
+      drawMirroredFrame(ctx, sourceVideo, width, height);
+      applyInfraredMapping(ctx, width, height);
+      return;
+    }
+
+    if (activeFilter === 'doubleExposure') {
+      drawGeneratedBackground(ctx, width, height);
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.8;
+      drawMirroredFrame(ctx, sourceVideo, width, height);
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+      drawWithCanvasFilter(ctx, 'blur(1px)', () => drawMirroredFrame(ctx, sourceVideo, width, height));
+      return;
+    }
+
+    if (activeFilter === 'bokeh') {
+      if (!sharpFrameCanvasRef.current) sharpFrameCanvasRef.current = document.createElement('canvas');
+      if (!blurredFrameCanvasRef.current) blurredFrameCanvasRef.current = document.createElement('canvas');
+      if (!foregroundCanvasRef.current) foregroundCanvasRef.current = document.createElement('canvas');
+
+      const sharpCanvas = sharpFrameCanvasRef.current;
+      const blurredCanvas = blurredFrameCanvasRef.current;
+      const foregroundCanvas = foregroundCanvasRef.current;
+
+      [sharpCanvas, blurredCanvas, foregroundCanvas].forEach((offscreen) => {
+        offscreen.width = width;
+        offscreen.height = height;
+      });
+
+      const sharpCtx = sharpCanvas.getContext('2d');
+      const blurredCtx = blurredCanvas.getContext('2d');
+      const foregroundCtx = foregroundCanvas.getContext('2d');
+
+      if (sharpCtx && blurredCtx && foregroundCtx) {
+        sharpCtx.clearRect(0, 0, width, height);
+        blurredCtx.clearRect(0, 0, width, height);
+        foregroundCtx.clearRect(0, 0, width, height);
+
+        drawMirroredFrame(sharpCtx, sourceVideo, width, height);
+        drawWithCanvasFilter(blurredCtx, 'blur(14px)', () => drawMirroredFrame(blurredCtx, sourceVideo, width, height));
+
+        ctx.drawImage(blurredCanvas, 0, 0);
+
+        const maskCanvas = bokehMaskCanvasRef.current;
+        if (maskCanvas) {
+          foregroundCtx.drawImage(sharpCanvas, 0, 0);
+          foregroundCtx.globalCompositeOperation = 'destination-in';
+          foregroundCtx.drawImage(maskCanvas, 0, 0, width, height);
+          foregroundCtx.globalCompositeOperation = 'source-over';
+          ctx.drawImage(foregroundCanvas, 0, 0);
+          return;
+        }
+      }
+
+      drawMirroredFrame(ctx, sourceVideo, width, height);
+      return;
+    }
+
+    drawMirroredFrame(ctx, sourceVideo, width, height);
+  }, [activeFilter, previewCssFilter]);
 
   const requestCamera = async () => {
     try {
@@ -56,6 +229,96 @@ export default function StudioSession() {
     }
   }, [step, stream]);
 
+  useEffect(() => {
+    if (activeFilter !== 'bokeh') return;
+    if (selfieSegmentationRef.current || typeof window === 'undefined') return;
+
+    let mounted = true;
+    const scriptId = 'mediapipe-selfie-segmentation';
+
+    const initializeModel = () => {
+      if (!window.SelfieSegmentation) return;
+      const model = new window.SelfieSegmentation({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
+      });
+      model.setOptions({ modelSelection: 1 });
+      model.onResults((results) => {
+        if (!mounted || !results.segmentationMask) return;
+        const maskCanvas = bokehMaskCanvasRef.current ?? document.createElement('canvas');
+        bokehMaskCanvasRef.current = maskCanvas;
+        const source = results.segmentationMask;
+        maskCanvas.width = source.width;
+        maskCanvas.height = source.height;
+        const maskCtx = maskCanvas.getContext('2d');
+        if (!maskCtx) return;
+        maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+        maskCtx.drawImage(source, 0, 0, maskCanvas.width, maskCanvas.height);
+      });
+      selfieSegmentationRef.current = model;
+      if (mounted) setIsBokehModelReady(true);
+    };
+
+    const existing = document.getElementById(scriptId) as HTMLScriptElement | null;
+    if (existing) {
+      if (window.SelfieSegmentation) {
+        initializeModel();
+      } else {
+        existing.addEventListener('load', initializeModel, { once: true });
+      }
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.id = scriptId;
+    script.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js';
+    script.async = true;
+    script.onload = initializeModel;
+    document.head.appendChild(script);
+
+    return () => {
+      mounted = false;
+    };
+  }, [activeFilter]);
+
+  useEffect(() => {
+    if (step !== 'session' || !requiresCanvasPreview) return;
+    const video = videoRef.current;
+    const previewCanvas = previewCanvasRef.current;
+    if (!video || !previewCanvas) return;
+
+    let raf = 0;
+    let disposed = false;
+
+    const render = async () => {
+      if (disposed) return;
+      const width = video.videoWidth;
+      const height = video.videoHeight;
+      if (width > 0 && height > 0) {
+        if (previewCanvas.width !== width || previewCanvas.height !== height) {
+          previewCanvas.width = width;
+          previewCanvas.height = height;
+        }
+        const previewCtx = previewCanvas.getContext('2d');
+        if (previewCtx) {
+          if (activeFilter === 'bokeh' && selfieSegmentationRef.current && !segmentationPendingRef.current) {
+            segmentationPendingRef.current = true;
+            selfieSegmentationRef.current.send({ image: video }).catch(console.error).finally(() => {
+              segmentationPendingRef.current = false;
+            });
+          }
+          await drawPhotoWithActiveFilter(previewCtx, width, height, video);
+        }
+      }
+      raf = window.requestAnimationFrame(() => void render());
+    };
+
+    raf = window.requestAnimationFrame(() => void render());
+    return () => {
+      disposed = true;
+      window.cancelAnimationFrame(raf);
+    };
+  }, [step, activeFilter, requiresCanvasPreview, drawPhotoWithActiveFilter]);
+
   // Handle timer for the session
   useEffect(() => {
     if (step === 'session' && timeLeft > 0) {
@@ -72,6 +335,7 @@ export default function StudioSession() {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
+      selfieSegmentationRef.current?.close?.();
     };
   }, [stream]);
 
@@ -113,10 +377,19 @@ export default function StudioSession() {
     if (ctx) {
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
-      // Mirror the capture to match the mirrored preview
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+
+      if (activeFilter === 'bokeh' && selfieSegmentationRef.current && !segmentationPendingRef.current) {
+        segmentationPendingRef.current = true;
+        try {
+          await selfieSegmentationRef.current.send({ image: videoRef.current });
+        } catch (error) {
+          console.error(error);
+        } finally {
+          segmentationPendingRef.current = false;
+        }
+      }
+
+      await drawPhotoWithActiveFilter(ctx, canvas.width, canvas.height, videoRef.current);
       const dataUri = canvas.toDataURL('image/jpeg');
       setCapturedPhotos(prev => [dataUri, ...prev]);
       
@@ -265,8 +538,23 @@ export default function StudioSession() {
                 autoPlay
                 playsInline
                 muted
-                className="w-full h-full object-cover scale-x-[-1]"
+                className={cn(
+                  "w-full h-full object-cover scale-x-[-1]",
+                  requiresCanvasPreview ? "opacity-0" : "opacity-100",
+                )}
+                style={{ filter: previewCssFilter }}
               />
+
+              {requiresCanvasPreview && (
+                <canvas
+                  ref={previewCanvasRef}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              )}
+
+              {activeFilter === 'mist' && (
+                <div className="absolute inset-0 pointer-events-none bg-white/10 backdrop-blur-[2px]" />
+              )}
               
               {isCapturing && (
                 <div className="absolute inset-0 bg-white animate-pulse z-50" />
@@ -327,6 +615,34 @@ export default function StudioSession() {
           </div>
 
           <div className="space-y-6">
+            <ZepretCard className="p-6">
+              <h3 className="text-sm md:text-lg font-black mb-4 md:mb-6 uppercase tracking-widest text-secondary">Filter Kamera</h3>
+              <ScrollArea className="h-40">
+                <div className="grid grid-cols-2 gap-2 md:gap-3 pr-3">
+                  {FILTER_OPTIONS.map((filter) => (
+                    <button
+                      key={filter.id}
+                      onClick={() => setActiveFilter(filter.id)}
+                      className={cn(
+                        "rounded-lg border px-3 py-2 text-left transition-all",
+                        activeFilter === filter.id
+                          ? "border-primary bg-primary/20 shadow-[0_0_15px_rgba(255,90,143,0.25)]"
+                          : "border-white/10 bg-white/5 hover:bg-white/10"
+                      )}
+                    >
+                      <p className="text-[10px] uppercase font-black tracking-widest text-zinc-400">{filter.category}</p>
+                      <p className="text-xs md:text-sm font-bold text-white">{filter.label}</p>
+                    </button>
+                  ))}
+                </div>
+              </ScrollArea>
+              {activeFilter === 'bokeh' && (
+                <p className="mt-4 text-[11px] text-zinc-400 font-bold">
+                  {isBokehModelReady ? 'Model segmentasi aktif: blur hanya area background.' : 'Memuat model segmentasi ringan...'}
+                </p>
+              )}
+            </ZepretCard>
+
             <ZepretCard className="bg-surface-container-low/50 p-6">
               <h3 className="text-sm md:text-lg font-black mb-4 md:mb-6 uppercase tracking-widest text-primary">Frames</h3>
               <div className="grid grid-cols-2 lg:grid-cols-2 gap-2 md:gap-3">
