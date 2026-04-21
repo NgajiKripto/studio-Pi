@@ -4,6 +4,7 @@ import { Sparkles, Camera, Zap, Heart, Download, Check, X, MousePointer2, Menu }
 import CameraScrollProgress from '@/components/CameraScrollProgress';
 import OrbitImages from '@/components/OrbitImages';
 import TrueFocus from '@/components/TrueFocus';
+import LightLines from '@/components/LightLines';
 import { 
   Sheet, 
   SheetContent, 
@@ -74,7 +75,14 @@ export default function Home() {
 
       {/* Hero Section */}
       <section id="hero-section" className="relative min-h-screen flex items-center justify-center px-4 py-20 lg:py-0 overflow-hidden cursor-crosshair group">
-        <div className="absolute -top-20 -left-20 w-64 md:w-96 h-64 md:h-96 bg-secondary-container/20 blur-[80px] md:blur-[120px] rounded-full animate-pulse-glow"></div>
+        <LightLines
+          className="absolute inset-0 z-0"
+          gradientFrom="#18181b"
+          gradientTo="#09090b"
+          lightColor="rgba(255, 90, 143, 0.5)"
+          lineColor="rgba(255, 255, 255, 0.1)"
+        />
+        <div className="absolute -top-20 -left-20 w-64 md:w-96 h-64 md:h-96 bg-secondary-container/20 blur-[80px] md:blur-[120px] rounded-full animate-pulse-glow z-0"></div>
         <div className="absolute top-1/2 -right-20 w-60 md:w-80 h-60 md:h-80 bg-primary-container/10 blur-[70px] md:blur-[100px] rounded-full"></div>
         
         <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10 pt-16 lg:pt-0">
