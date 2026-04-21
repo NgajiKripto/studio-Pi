@@ -8,6 +8,7 @@ import { generateSocialShareSuggestions } from '@/ai/flows/ai-social-share-sugge
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { SelfieSegmentation, type Results as SelfieSegmentationResults } from '@mediapipe/selfie_segmentation';
 
 type Step = 'permission' | 'terms' | 'package' | 'payment' | 'session' | 'review';
 type CameraFilterId = 'none' | 'bw' | 'silhouette' | 'mist' | 'infrared' | 'doubleExposure' | 'bokeh';
@@ -73,17 +74,6 @@ const drawWithCanvasFilter = (ctx: CanvasRenderingContext2D, filter: string, dra
   ctx.filter = previous;
 };
 
-declare global {
-  interface Window {
-    SelfieSegmentation?: new (options: { locateFile: (file: string) => string }) => {
-      setOptions: (options: { modelSelection: number }) => void;
-      onResults: (callback: (results: { segmentationMask?: HTMLCanvasElement }) => void) => void;
-      send: (payload: { image: HTMLVideoElement }) => Promise<void>;
-      close?: () => void;
-    };
-  }
-}
-
 export default function StudioSession() {
   const [step, setStep] = useState<Step>('permission');
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -98,12 +88,13 @@ export default function StudioSession() {
   const [socialSuggestions, setSocialSuggestions] = useState<{captions: string[], hashtags: string[]} | null>(null);
   const [activeFilter, setActiveFilter] = useState<CameraFilterId>('none');
   const [isBokehModelReady, setIsBokehModelReady] = useState(false);
+  const [bokehError, setBokehError] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const bokehMaskCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const selfieSegmentationRef = useRef<InstanceType<NonNullable<typeof window.SelfieSegmentation>> | null>(null);
+  const selfieSegmentationRef = useRef<SelfieSegmentation | null>(null);
   const segmentationPendingRef = useRef(false);
   const sharpFrameCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const blurredFrameCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -209,6 +200,26 @@ export default function StudioSession() {
     drawMirroredFrame(ctx, sourceVideo, width, height);
   }, [activeFilter, previewCssFilter]);
 
+  const runSegmentationFrame = useCallback(async (
+    sourceVideo: HTMLVideoElement,
+    context: 'preview' | 'capture'
+  ) => {
+    if (!selfieSegmentationRef.current || segmentationPendingRef.current) return;
+    segmentationPendingRef.current = true;
+    try {
+      await selfieSegmentationRef.current.send({ image: sourceVideo });
+      if (bokehError) setBokehError(null);
+    } catch (error) {
+      const message = context === 'preview'
+        ? 'Bokeh preview sedang bermasalah, lanjutkan tanpa blur background.'
+        : 'Bokeh capture gagal diproses, foto diambil tanpa segmentasi terbaru.';
+      setBokehError(message);
+      console.error(`Failed to process segmentation for ${context}`, error);
+    } finally {
+      segmentationPendingRef.current = false;
+    }
+  }, [bokehError]);
+
   const requestCamera = async () => {
     try {
       const s = await navigator.mediaDevices.getUserMedia({ 
@@ -235,18 +246,15 @@ export default function StudioSession() {
 
   useEffect(() => {
     if (activeFilter !== 'bokeh') return;
-    if (selfieSegmentationRef.current || typeof window === 'undefined') return;
+    if (selfieSegmentationRef.current) return;
 
     let mounted = true;
-    const scriptId = 'mediapipe-selfie-segmentation';
-
-    const initializeModel = () => {
-      if (!window.SelfieSegmentation) return;
-      const model = new window.SelfieSegmentation({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
+    const initializeModel = async () => {
+      const model = new SelfieSegmentation({
+        locateFile: (file) => `/vendor/mediapipe/${file}`,
       });
       model.setOptions({ modelSelection: 1 });
-      model.onResults((results) => {
+      model.onResults((results: SelfieSegmentationResults) => {
         if (!mounted || !results.segmentationMask) return;
         const maskCanvas = bokehMaskCanvasRef.current ?? document.createElement('canvas');
         bokehMaskCanvasRef.current = maskCanvas;
@@ -258,26 +266,15 @@ export default function StudioSession() {
         maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
         maskCtx.drawImage(source, 0, 0, maskCanvas.width, maskCanvas.height);
       });
+      await model.initialize();
       selfieSegmentationRef.current = model;
       if (mounted) setIsBokehModelReady(true);
     };
 
-    const existing = document.getElementById(scriptId) as HTMLScriptElement | null;
-    if (existing) {
-      if (window.SelfieSegmentation) {
-        initializeModel();
-      } else {
-        existing.addEventListener('load', initializeModel, { once: true });
-      }
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.id = scriptId;
-    script.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js';
-    script.async = true;
-    script.onload = initializeModel;
-    document.head.appendChild(script);
+    initializeModel().catch((error) => {
+      setBokehError('Model bokeh gagal dimuat, gunakan filter lain atau coba lagi.');
+      console.error('Failed to initialize bokeh segmentation model', error);
+    });
 
     return () => {
       mounted = false;
@@ -304,11 +301,8 @@ export default function StudioSession() {
         }
         const previewCtx = previewCanvas.getContext('2d');
         if (previewCtx) {
-          if (activeFilter === 'bokeh' && selfieSegmentationRef.current && !segmentationPendingRef.current) {
-            segmentationPendingRef.current = true;
-            selfieSegmentationRef.current.send({ image: video }).catch(console.error).finally(() => {
-              segmentationPendingRef.current = false;
-            });
+          if (activeFilter === 'bokeh') {
+            await runSegmentationFrame(video, 'preview');
           }
           await drawPhotoWithActiveFilter(previewCtx, width, height, video);
         }
@@ -321,7 +315,7 @@ export default function StudioSession() {
       disposed = true;
       window.cancelAnimationFrame(raf);
     };
-  }, [step, activeFilter, requiresCanvasPreview, drawPhotoWithActiveFilter]);
+  }, [step, activeFilter, requiresCanvasPreview, drawPhotoWithActiveFilter, runSegmentationFrame]);
 
   // Handle timer for the session
   useEffect(() => {
@@ -383,14 +377,7 @@ export default function StudioSession() {
       canvas.height = videoRef.current.videoHeight;
 
       if (activeFilter === 'bokeh' && selfieSegmentationRef.current && !segmentationPendingRef.current) {
-        segmentationPendingRef.current = true;
-        try {
-          await selfieSegmentationRef.current.send({ image: videoRef.current });
-        } catch (error) {
-          console.error(error);
-        } finally {
-          segmentationPendingRef.current = false;
-        }
+        await runSegmentationFrame(videoRef.current, 'capture');
       }
 
       await drawPhotoWithActiveFilter(ctx, canvas.width, canvas.height, videoRef.current);
@@ -620,7 +607,7 @@ export default function StudioSession() {
 
           <div className="space-y-6">
             <ZepretCard className="p-6">
-              <h3 className="text-sm md:text-lg font-black mb-4 md:mb-6 uppercase tracking-widest text-secondary">Filter Kamera</h3>
+              <h3 className="text-sm md:text-lg font-black mb-4 md:mb-6 uppercase tracking-widest text-secondary">Camera Filters</h3>
               <ScrollArea className="h-40">
                 <div className="grid grid-cols-2 gap-2 md:gap-3 pr-3">
                   {FILTER_OPTIONS.map((filter) => (
@@ -642,8 +629,11 @@ export default function StudioSession() {
               </ScrollArea>
               {activeFilter === 'bokeh' && (
                 <p className="mt-4 text-[11px] text-zinc-400 font-bold">
-                  {isBokehModelReady ? 'Model segmentasi aktif: blur hanya area background.' : 'Memuat model segmentasi ringan...'}
+                  {isBokehModelReady ? 'Segmentation model active: blur applies to background only.' : 'Loading lightweight segmentation model...'}
                 </p>
+              )}
+              {activeFilter === 'bokeh' && bokehError && (
+                <p className="mt-2 text-[11px] text-red-400 font-bold">{bokehError}</p>
               )}
             </ZepretCard>
 
