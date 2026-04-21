@@ -18,7 +18,7 @@ const ADVANCED_FILTERS: CameraFilterId[] = ['infrared', 'doubleExposure', 'bokeh
 const FILTER_OPTIONS: Array<{ id: CameraFilterId; label: string; category: string }> = [
   { id: 'none', label: 'Original', category: 'Default' },
   { id: 'bw', label: 'Black & White', category: 'CSS' },
-  { id: 'silhouette', label: 'Siluet', category: 'CSS' },
+  { id: 'silhouette', label: 'Silhouette', category: 'CSS' },
   { id: 'mist', label: 'Fog / Mist', category: 'CSS' },
   { id: 'infrared', label: 'Infrared', category: 'Canvas' },
   { id: 'doubleExposure', label: 'Double Exposure', category: 'Canvas' },
@@ -133,7 +133,9 @@ export default function StudioSession() {
 
     if (activeFilter === 'mist') {
       drawWithCanvasFilter(ctx, 'saturate(1.05) contrast(1.05)', () => drawMirroredFrame(ctx, sourceVideo, width, height));
+      ctx.globalAlpha = 0.32;
       drawWithCanvasFilter(ctx, 'blur(2px)', () => drawMirroredFrame(ctx, sourceVideo, width, height));
+      ctx.globalAlpha = 1;
       const mistLayer = ctx.createLinearGradient(0, 0, 0, height);
       mistLayer.addColorStop(0, 'rgba(255,255,255,0.24)');
       mistLayer.addColorStop(1, 'rgba(228,240,255,0.08)');
@@ -153,9 +155,11 @@ export default function StudioSession() {
       ctx.globalCompositeOperation = 'screen';
       ctx.globalAlpha = 0.8;
       drawMirroredFrame(ctx, sourceVideo, width, height);
+      ctx.globalCompositeOperation = 'soft-light';
+      ctx.globalAlpha = 0.25;
+      drawWithCanvasFilter(ctx, 'blur(1px)', () => drawMirroredFrame(ctx, sourceVideo, width, height));
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = 'source-over';
-      drawWithCanvasFilter(ctx, 'blur(1px)', () => drawMirroredFrame(ctx, sourceVideo, width, height));
       return;
     }
 
