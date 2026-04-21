@@ -16,6 +16,8 @@
 
 .focus-frame {
   position: absolute;
+  top: 0;
+  left: 0;
   pointer-events: none;
   border: 1px solid var(--border-color);
   box-shadow: 0 0 15px var(--glow-color);
