@@ -70,16 +70,14 @@ const TrueFocus = ({
       if (currentIndex < 0 || currentIndex >= words.length) return;
       if (!wordRefs.current[currentIndex] || !containerRef.current) return;
 
-      const parentRect = containerRef.current.getBoundingClientRect();
       const activeElement = wordRefs.current[currentIndex];
       
       if (activeElement) {
-        const activeRect = activeElement.getBoundingClientRect();
         setFocusRect({
-          x: activeRect.left - parentRect.left,
-          y: activeRect.top - parentRect.top,
-          width: activeRect.width,
-          height: activeRect.height
+          x: activeElement.offsetLeft,
+          y: activeElement.offsetTop,
+          width: activeElement.offsetWidth,
+          height: activeElement.offsetHeight
         });
       }
     };
