@@ -7,6 +7,7 @@ import { aiPoseGuide } from '@/ai/flows/ai-pose-guide';
 import { generateSocialShareSuggestions } from '@/ai/flows/ai-social-share-suggestions';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
+import { CameraViewport, CameraViewportRef, FilterType } from './CameraViewport';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Step = 'permission' | 'terms' | 'package' | 'payment' | 'session' | 'review';
@@ -25,9 +26,9 @@ export default function StudioSession() {
   const [aiSuggestion, setAiSuggestion] = useState<string>('');
   const [isLoadingAi, setIsLoadingAi] = useState(false);
   const [socialSuggestions, setSocialSuggestions] = useState<{captions: string[], hashtags: string[]} | null>(null);
+  const [activeFilter, setActiveFilter] = useState<FilterType>('none');
 
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const viewportRef = useRef<CameraViewportRef>(null);
 
   const currentStepIndex = STEPS.indexOf(step);
   const progressPercent = ((currentStepIndex + 1) / STEPS.length) * 100;
@@ -48,13 +49,6 @@ export default function StudioSession() {
       alert('Akses kamera ditolak. Plis izinin biar bisa Zepret!');
     }
   };
-
-  // Sync stream to video element whenever step becomes 'session'
-  useEffect(() => {
-    if (step === 'session' && stream && videoRef.current) {
-      videoRef.current.srcObject = stream;
-    }
-  }, [step, stream]);
 
   // Handle timer for the session
   useEffect(() => {
@@ -102,22 +96,15 @@ export default function StudioSession() {
   };
 
   const capturePhoto = async () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    if (!viewportRef.current) return;
     setIsCapturing(true);
     
     // Reset countdown state
     setCaptureCountdown(null);
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      // Mirror the capture to match the mirrored preview
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-      const dataUri = canvas.toDataURL('image/jpeg');
+    const dataUri = viewportRef.current.capture();
+
+    if (dataUri) {
       setCapturedPhotos(prev => [dataUri, ...prev]);
       
       setIsLoadingAi(true);
@@ -259,13 +246,26 @@ export default function StudioSession() {
       {step === 'session' && (
         <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
           <div className="lg:col-span-3 space-y-6">
+            <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide">
+               {['none', 'bw', 'silhouette', 'fog', 'infrared', 'double-exposure', 'bokeh'].map((f) => (
+                 <button
+                   key={f}
+                   onClick={() => setActiveFilter(f as FilterType)}
+                   className={cn(
+                     "px-4 py-2 text-xs md:text-sm rounded-full font-bold uppercase tracking-widest whitespace-nowrap transition-colors",
+                     activeFilter === f ? "bg-primary text-white" : "bg-white/10 text-white/70 hover:bg-white/20"
+                   )}
+                 >
+                   {f}
+                 </button>
+               ))}
+            </div>
             <div className="relative glass-panel rounded-xl md:rounded-2xl bg-black aspect-video overflow-hidden shadow-[0_0_100px_rgba(255,90,143,0.15)]">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover scale-x-[-1]"
+              <CameraViewport
+                ref={viewportRef}
+                stream={stream}
+                filterType={activeFilter}
+                className="w-full h-full"
               />
               
               {isCapturing && (
@@ -438,7 +438,6 @@ export default function StudioSession() {
         </div>
       )}
 
-      <canvas ref={canvasRef} className="hidden" />
     </div>
   );
 }
