@@ -13,11 +13,14 @@ import {z} from 'genkit';
 const AiPoseGuideInputSchema = z.object({
   photoDataUri: z
     .string()
+    .regex(/^data:image\/(png|jpeg|jpg|webp);base64,/, 'Must be a valid base64 image data URI')
+    .max(10_000_000, 'Image data is too large')
     .describe(
       "A photo of the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'. This is used to understand the current pose and context."
     ),
   currentContext: z
     .string()
+    .max(500, 'Context is too long')
     .optional()
     .describe(
       'Optional text providing context about the current photo session, e.g., "taking a selfie with friends" or "trying to look cool and casual".'
