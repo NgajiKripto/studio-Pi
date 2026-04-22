@@ -105,7 +105,7 @@ export const CameraViewport = forwardRef<CameraViewportRef, CameraViewportProps>
               } else if (filterType === 'bokeh' && segmenterRef.current) {
                 try {
                   const segmentation = await segmenterRef.current.segmentPeople(video, {
-                    flipHorizontal: false,
+                    flipHorizontal: true,
                     multiSegmentation: false,
                     segmentBodyParts: false,
                   });
@@ -123,15 +123,8 @@ export const CameraViewport = forwardRef<CameraViewportRef, CameraViewportProps>
                        foregroundThreshold,
                        blurAmount,
                        edgeBlurAmount,
-                       false // flipHorizontal -> already flipped via canvas
+                       true // flipHorizontal
                      );
-
-                     // Flip back since drawBokehEffect takes video directly and we need mirror
-                     ctx.save();
-                     ctx.translate(renderCanvas.width, 0);
-                     ctx.scale(-1, 1);
-                     ctx.drawImage(renderCanvas, 0, 0, renderCanvas.width, renderCanvas.height);
-                     ctx.restore();
                   }
                 } catch (e) {
                    // ignoring transient segmentation errors
@@ -173,16 +166,7 @@ export const CameraViewport = forwardRef<CameraViewportRef, CameraViewportProps>
         if (filterType === 'infrared' || filterType === 'double-exposure' || filterType === 'bokeh') {
           // If canvas filters are active, use the rendered canvas
           if (renderCanvasRef.current) {
-            if (filterType !== 'bokeh') {
-                ctx.drawImage(renderCanvasRef.current, 0, 0);
-            } else {
-                // For bokeh, we already applied the flip inside the draw loop manually at the end
-                // so we just draw directly
-                ctx.save();
-                ctx.setTransform(1, 0, 0, 1, 0, 0); // reset transform
-                ctx.drawImage(renderCanvasRef.current, 0, 0);
-                ctx.restore();
-            }
+            ctx.drawImage(renderCanvasRef.current, 0, 0);
           }
         } else {
           // Otherwise, capture straight from video
