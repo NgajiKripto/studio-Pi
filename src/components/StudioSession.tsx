@@ -7,7 +7,13 @@ import { aiPoseGuide } from '@/ai/flows/ai-pose-guide';
 import { generateSocialShareSuggestions } from '@/ai/flows/ai-social-share-suggestions';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
-import { CameraViewport, CameraViewportRef, FilterType } from './CameraViewport';
+import dynamic from 'next/dynamic';
+import { CameraViewportRef, FilterType } from './CameraViewport';
+
+// Fix Next.js SSR error regarding SelfieSegmentation in @tensorflow-models/body-segmentation
+// Using the new dynamic import syntax without `ssr: false` in app router if possible,
+// or let's try isolating the CameraViewport to be purely client-side
+const CameraViewport = dynamic(() => import('./CameraViewport').then(mod => mod.CameraViewport), { ssr: false });
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Step = 'permission' | 'terms' | 'package' | 'payment' | 'session' | 'review';
@@ -37,8 +43,8 @@ export default function StudioSession() {
     try {
       const s = await navigator.mediaDevices.getUserMedia({ 
         video: { 
-          width: { ideal: 1280 }, 
-          height: { ideal: 720 }, 
+          width: { ideal: 720 },
+          height: { ideal: 1280 },
           facingMode: "user" 
         }, 
         audio: false 
@@ -260,7 +266,7 @@ export default function StudioSession() {
                  </button>
                ))}
             </div>
-            <div className="relative glass-panel rounded-xl md:rounded-2xl bg-black aspect-video overflow-hidden shadow-[0_0_100px_rgba(255,90,143,0.15)]">
+            <div className="relative glass-panel rounded-xl md:rounded-2xl bg-black aspect-[3/4] overflow-hidden shadow-[0_0_100px_rgba(255,90,143,0.15)]">
               <CameraViewport
                 ref={viewportRef}
                 stream={stream}
