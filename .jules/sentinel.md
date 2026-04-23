@@ -7,3 +7,7 @@
 **Vulnerability:** The application was missing basic security headers (e.g., X-Content-Type-Options, X-Frame-Options, Strict-Transport-Security) in its Next.js configuration. This left the application vulnerable to basic attacks like MIME-type sniffing, clickjacking, and man-in-the-middle attacks.
 **Learning:** By default, Next.js does not enforce these security headers. They must be explicitly configured using the `headers()` async function in `next.config.ts`.
 **Prevention:** Always include a baseline set of security headers via the `headers()` configuration in `next.config.ts` to enforce secure defaults for all routes globally.
+## 2026-04-23 - Syntax Errors in Permissions-Policy Headers
+**Vulnerability:** The `Permissions-Policy` header had a syntax error (`camera=self` instead of `camera=(self)`). This causes the browser to ignore the directive or the entire policy, reducing the effectiveness of the intended security configuration.
+**Learning:** `Permissions-Policy` allows lists must always be wrapped in parentheses (e.g., `camera=(self)` or `geolocation=()`).
+**Prevention:** Always verify the correct W3C syntax for `Permissions-Policy` and similar headers when implementing them, rather than relying on intuitive but incorrect syntax like `key=value`.
