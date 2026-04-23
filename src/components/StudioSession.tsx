@@ -244,15 +244,15 @@ export default function StudioSession() {
       )}
 
       {step === 'session' && (
-        <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
-          <div className="lg:col-span-3 space-y-6">
+        <div className="grid lg:grid-cols-4 gap-6 lg:gap-8 w-full min-w-0">
+          <div className="lg:col-span-3 space-y-6 min-w-0">
             <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide">
                {['none', 'bw', 'silhouette', 'fog', 'infrared', 'double-exposure', 'bokeh'].map((f) => (
                  <button
                    key={f}
                    onClick={() => setActiveFilter(f as FilterType)}
                    className={cn(
-                     "px-4 py-2 text-xs md:text-sm rounded-full font-bold uppercase tracking-widest whitespace-nowrap transition-colors",
+                     "shrink-0 px-4 py-2 text-xs md:text-sm rounded-full font-bold uppercase tracking-widest whitespace-nowrap transition-colors",
                      activeFilter === f ? "bg-primary text-white" : "bg-white/10 text-white/70 hover:bg-white/20"
                    )}
                  >
