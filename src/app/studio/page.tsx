@@ -1,6 +1,9 @@
-import StudioSession from '@/components/StudioSession';
+"use client";
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+
+const StudioSession = dynamic(() => import('@/components/StudioSession'), { ssr: false });
 
 export default function StudioPage() {
   return (

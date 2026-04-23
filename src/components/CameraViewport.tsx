@@ -1,5 +1,5 @@
+"use client";
 import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
-import * as bodySegmentation from '@tensorflow-models/body-segmentation';
 import * as tf from '@tensorflow/tfjs';
 // To fix WebGL backend we would normally import '@tensorflow/tfjs-backend-webgl'; but it is part of core
 
@@ -40,15 +40,16 @@ export const CameraViewport = forwardRef<CameraViewportRef, CameraViewportProps>
       }
     }, [stream]);
 
-    const segmenterRef = useRef<bodySegmentation.BodySegmenter | null>(null);
+    const segmenterRef = useRef<any | null>(null);
 
     useEffect(() => {
       const initSegmenter = async () => {
         if (!segmenterRef.current) {
           try {
             await tf.ready();
+            const bodySegmentation = await import('@tensorflow-models/body-segmentation');
             const model = bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation;
-            const segmenterConfig: bodySegmentation.MediaPipeSelfieSegmentationTfjsModelConfig = {
+            const segmenterConfig: any = {
               runtime: 'tfjs', // Use 'tfjs' instead of 'mediapipe' to reduce heavy loading issues if mediapipe tasks vision not loaded perfectly
               modelType: 'general'
             };
@@ -116,6 +117,7 @@ export const CameraViewport = forwardRef<CameraViewportRef, CameraViewportProps>
                      const blurAmount = 10;
 
                      // We use the drawBokehEffect provided by the library
+                     const bodySegmentation = await import('@tensorflow-models/body-segmentation');
                      await bodySegmentation.drawBokehEffect(
                        renderCanvas,
                        video,
