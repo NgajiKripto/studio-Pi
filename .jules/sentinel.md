@@ -15,3 +15,8 @@
 **Vulnerability:** The shadcn/ui chart component (`src/components/ui/chart.tsx`) was vulnerable to CSS and HTML injection through the `id` property. The component used the provided `id` directly inside a `<style>` block rendered with `dangerouslySetInnerHTML`. If an attacker gained control over the `id` prop, they could inject arbitrary HTML (e.g. `</style><script>alert(1)</script>`) or malicious CSS.
 **Learning:** `dangerouslySetInnerHTML` is commonly used in UI libraries for styling dynamic components, but passing unsanitized props like `id` into these blocks is a common vector for XSS and CSS injection attacks.
 **Prevention:** Always explicitly sanitize user-provided values like `id` before injecting them into HTML/CSS string contexts. For IDs, enforce strict whitelisting of safe characters using regex (e.g., `replace(/[^a-zA-Z0-9-]/g, "")`).
+
+## 2025-05-24 - Missing Secure Flags in Client-Side Cookies
+**Vulnerability:** The application was manually setting a cookie (`sidebar:state`) via `document.cookie` without including `SameSite=Lax` and `Secure` attributes. This could allow the cookie to be sent in cross-site requests (increasing CSRF risks) or transmitted over unencrypted connections.
+**Learning:** Even non-authentication UI state cookies should follow secure-by-default practices to minimize the attack surface and prevent potential cross-site leakage or manipulation.
+**Prevention:** Always append security flags like `; SameSite=Lax; Secure` when manually setting cookies in the application via `document.cookie`.
