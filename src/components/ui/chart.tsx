@@ -90,7 +90,12 @@ ${colorConfig
     const color =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
       itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
+
+    // Sanitize key and color to prevent CSS injection
+    const safeKey = key.replace(/[^a-zA-Z0-9-]/g, "");
+    const safeColor = color ? color.replace(/[;{}<>"]/g, "") : null;
+
+    return safeColor ? `  --color-${safeKey}: ${safeColor};` : null
   })
   .join("\n")}
 }
