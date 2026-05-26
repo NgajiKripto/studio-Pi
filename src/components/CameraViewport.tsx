@@ -40,7 +40,7 @@ export const CameraViewport = forwardRef<CameraViewportRef, CameraViewportProps>
       }
     }, [stream]);
 
-    const segmenterRef = useRef<any | null>(null);
+    const segmenterRef = useRef<unknown | null>(null);
 
     useEffect(() => {
       const initSegmenter = async () => {
@@ -49,7 +49,7 @@ export const CameraViewport = forwardRef<CameraViewportRef, CameraViewportProps>
             await tf.ready();
             const bodySegmentation = await import('@tensorflow-models/body-segmentation');
             const model = bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation;
-            const segmenterConfig: any = {
+            const segmenterConfig: unknown = {
               runtime: 'tfjs', // Use 'tfjs' instead of 'mediapipe' to reduce heavy loading issues if mediapipe tasks vision not loaded perfectly
               modelType: 'general'
             };

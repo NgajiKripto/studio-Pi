@@ -213,7 +213,7 @@ export default function OrbitImages({
     if (paused) return;
     const controls = animate(progress, direction === 'reverse' ? -100 : 100, {
       duration,
-      ease: easing as any,
+      ease: easing as undefined,
       repeat: Infinity,
       repeatType: 'loop',
     });
