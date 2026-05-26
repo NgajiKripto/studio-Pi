@@ -102,7 +102,7 @@ const TrueFocus = ({
             style={{
               filter: isActive ? 'blur(0px)' : `blur(${blurAmount}px)`,
               transition: `filter ${animationDuration}s ease`,
-              // @ts-ignore
+              // @ts-expect-error - ignore unused variable
               '--border-color': borderColor,
               '--glow-color': glowColor,
             }}
@@ -127,7 +127,7 @@ const TrueFocus = ({
           ease: "easeInOut"
         }}
         style={{
-          // @ts-ignore
+          // @ts-expect-error - ignore unused variable
           '--border-color': borderColor,
           '--glow-color': glowColor
         }}
