@@ -87,10 +87,13 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
-    const color =
+    const rawColor =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
       itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
+    // Sanitize key and color to prevent CSS/HTML injection
+    const safeKey = key ? key.replace(/[^a-zA-Z0-9-_]/g, "") : "";
+    const safeColor = rawColor ? rawColor.replace(/[;{}<>"']/g, "") : "";
+    return safeColor ? `  --color-${safeKey}: ${safeColor};` : null
   })
   .join("\n")}
 }
