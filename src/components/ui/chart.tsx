@@ -78,19 +78,29 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
+  // Sanitize user-provided id, key, and color values to prevent CSS/HTML injection via dangerouslySetInnerHTML
+  const safeId = id.replace(/[^a-zA-Z0-9-_:]/g, "")
+
   return (
     <style
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
           .map(
             ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
+${prefix} [data-chart=${safeId}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
     const color =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
       itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
+
+    if (!color) return null;
+
+    // Allow valid CSS variable naming characters and valid color values while stopping injection
+    const safeKey = key.replace(/[^a-zA-Z0-9-_]/g, "")
+    const safeColor = color.replace(/[;{}<>"']/g, "")
+
+    return `  --color-${safeKey}: ${safeColor};`
   })
   .join("\n")}
 }
