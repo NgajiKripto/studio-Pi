@@ -15,3 +15,8 @@
 **Vulnerability:** The shadcn/ui chart component (`src/components/ui/chart.tsx`) was vulnerable to CSS and HTML injection through the `id` property. The component used the provided `id` directly inside a `<style>` block rendered with `dangerouslySetInnerHTML`. If an attacker gained control over the `id` prop, they could inject arbitrary HTML (e.g. `</style><script>alert(1)</script>`) or malicious CSS.
 **Learning:** `dangerouslySetInnerHTML` is commonly used in UI libraries for styling dynamic components, but passing unsanitized props like `id` into these blocks is a common vector for XSS and CSS injection attacks.
 **Prevention:** Always explicitly sanitize user-provided values like `id` before injecting them into HTML/CSS string contexts. For IDs, enforce strict whitelisting of safe characters using regex (e.g., `replace(/[^a-zA-Z0-9-]/g, "")`).
+
+## 2026-07-04 - CSS Injection in UI Components
+**Vulnerability:** The shadcn/ui chart component `src/components/ui/chart.tsx` dynamically rendered a `<style>` block using `dangerouslySetInnerHTML` that interpolated unfiltered configuration properties (`key` and `color`) directly into CSS syntax.
+**Learning:** While `id` fields might be sanitized, objects driving the configuration loop (like `ChartConfig`) can be vectors for injection if they reflect user-controlled input (e.g., pulling a dynamic color value). This can lead to arbitrary CSS/HTML injection within the style block.
+**Prevention:** Strictly sanitize any variables inserted into `<style dangerouslySetInnerHTML={...}>` blocks. Ensure keys only contain alphanumerics and hyphens/underscores, and colors only contain valid characters, rejecting characters like `<`, `>`, `{`, `}`, `;`, and quotes.
